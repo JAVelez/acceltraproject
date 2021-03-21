@@ -12,8 +12,4 @@ urlpatterns = [
     path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
     # ex: /cgeassembly/5/vote/
     path('<int:motion_id>/vote/', views.vote, name='vote'),
-    #  ex: /cgeassembly/signup
-    path('signup/', views.signup, name='vote'),
-    #  ex: /cgeassembly/student
-    path('student/', views.StudentView.as_view(), name='student'),
 ]
