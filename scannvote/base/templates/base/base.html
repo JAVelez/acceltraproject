@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scan-N-Vote</title>
+</head>
+  <body>
+    <header>
+      <h1>Scan-N-Vote</h1>
+      {% if user.is_authenticated %}
+        <a href="{% url 'home:logout' %}">logout</a>
+      {% else %}
+        <a href="{% url 'home:login' %}">login</a> / <a href="{% url 'home:signup' %}">signup</a>
+      {% endif %}
+      <hr>
+    </header>
+    <main>
+      {% block content %}
+      {% endblock %}
+    </main>
+  </body>
+</html>

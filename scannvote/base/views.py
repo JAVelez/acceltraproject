@@ -1,13 +1,17 @@
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.views import generic
 
-from .forms import SignUpForm
-from .models import Student
+from .forms import SignUpForm, LoginForm
 
 # Create your views here.
+
+
+@login_required()
+def home(request):
+    return render(request, 'base/home.html')
 
 
 def signup(request):
@@ -21,12 +25,23 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=user.username, password=raw_password)
             login(request, user)
-            return HttpResponseRedirect(reverse('base:student', args=(user,)))
+            return HttpResponseRedirect(reverse('home:home'))
     else:
         form = SignUpForm()
     return render(request, 'base/signup.html', {'form': form})
 
 
-class StudentView(generic.DetailView):
-    model = Student
-    template_name = 'base/student.html'
+def login_student(request):
+    if request.method == 'POST':
+        user = authenticate(username=request.POST['username'], password=request.POST['password'])
+        login(request, user)
+        return HttpResponseRedirect(reverse('home:home'))
+    else:
+        form = LoginForm()
+    return render(request, 'base/login.html', {'form': form})
+
+
+def logout_student(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('home:home'))
+

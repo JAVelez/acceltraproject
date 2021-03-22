@@ -1,11 +1,17 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 
 from . import views
 
-app_name = ''
+app_name = 'home'
 urlpatterns = [
-    #  ex: /signup
-    path('signup/', views.signup, name='vote'),
-    #  ex: /student
-    path('student/', views.StudentView.as_view(), name='student'),
+    #  ex: home/signup
+    path(r'signup/', views.signup, name='signup'),
+    #  ex: home/student
+    path(r'', views.home, name='home'),
+    #  ex: home/login
+    path(r'login/', views.login_student, name='login'),
+    #  ex: home/logout
+    path(r'logout/', views.logout_student, name='logout'),
+
 ]

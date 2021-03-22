@@ -1,9 +1,13 @@
-{% if latest_motion_list %}
-    <ul>
-    {% for motion in latest_motion_list %}
-        <li><a href= "{% url 'cgeassembly:detail' motion.id %}">{{ motion.motion_text }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No polls are available.</p>
-{% endif %}
+{% extends 'base/base.html' %}
+
+{% block content %}
+    {% if latest_motion_list %}
+        <ul>
+        {% for motion in latest_motion_list %}
+            <li><a href= "{% url 'cgeassembly:detail' motion.id %}">{{ motion.motion_text }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No polls are available.</p>
+    {% endif %}
+{% endblock %}

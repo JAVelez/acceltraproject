@@ -15,6 +15,9 @@ class Student(models.Model):
     student_id = models.CharField(max_length=9, blank=False)
     faculty = models.CharField(max_length=50, choices=faculty_choices)
 
+    def __str__(self):
+        return self.student_id
+
 
 @receiver(post_save, sender=User)
 def update_user_profile(sender, instance, created, **kwargs):
