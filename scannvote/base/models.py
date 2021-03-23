@@ -12,8 +12,7 @@ class Student(models.Model):
     }
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    student_id = models.CharField(max_length=9, blank=False, unique=True,
-                                  error_messages={'unique': ("A user with that username already exists."), }, )
+    student_id = models.CharField(max_length=9, blank=False, unique=True)
     faculty = models.CharField(max_length=50, choices=faculty_choices)
 
     def __str__(self):
