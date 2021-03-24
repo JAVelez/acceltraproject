@@ -30,4 +30,4 @@ class InteractionAdmin(admin.ModelAdmin):
 
 admin.site.register(Motion, MotionAdmin)
 admin.site.register(Assembly, AssemblyAdmin)
-# admin.site.register(Interaction, InteractionAdmin)
+admin.site.register(Interaction, InteractionAdmin)

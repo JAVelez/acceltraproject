@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 import base.models as base
 
@@ -10,36 +12,66 @@ class Assembly(models.Model):
     date = models.DateTimeField('event date')
     quorum = models.IntegerField(default=0, editable=False)
     agenda = models.CharField(max_length=500, default="")
+    archived = models.BooleanField(default=False)
 
     def __str__(self):
         return self.assembly_name
 
     def get_attendee_list(self):
-        attendee_list = Interaction.objects.filter(assembly=self, attending=True)
+        attendee_list = base.Student.objects.filter(attending=True)
         return attendee_list
 
-    def get_active_list(self):
-        active_list = self.get_attendee_list().order_by('timestamp').distinct('student')
-        return active_list
+    # def get_active_list(self):
+    #     active_list = self.get_attendee_list().order_by('timestamp').distinct('student')
+    #     return active_list
 
     def get_quorum_count(self):
-        quorum = self.get_active_list().count()
+        quorum = self.get_attendee_list().count()
         return quorum
+
+    def update_quorum(self):
+        self.quorum = self.get_quorum_count()
+
+    def get_prev_assembly(self):
+        qs = Assembly.objects.order_by('-date')
+        if len(qs) == 1:
+            return None
+        else:
+            return qs[1]
 
     class Meta:
         verbose_name_plural = "Assemblies"
 
+# TODO adaptar método para assembly y motion y ammendment lmao
+@receiver(post_save, sender=Assembly)
+def update_assembly_archive(sender, instance, created, **kwargs):
+    if created:
+        assembly_to_archive = instance.get_prev_assembly()
+        if assembly_to_archive:
+            assembly_to_archive.archived = True
+            assembly_to_archive.save()
+
 
 class Interaction(models.Model):
-    student = models.OneToOneField(base.Student, on_delete=models.CASCADE, primary_key=True)
+    # id = models.BigIntegerField(primary_key=True)
+    student = models.ForeignKey(base.Student, on_delete=models.CASCADE)
     timestamp = models.DateTimeField('date interacted', default=timezone.now)
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
-    # TODO consider moving this attribute to student model and updating according
-    #  to latest daily interaction interaction
-    attending = models.BooleanField()
 
-    def update_quorum(self):
-        self.assembly.quorum = Assembly.get_quorum_count()
+    def count_student_interactions(self, student_id):
+        count = Interaction.objects.filter(student_id=student_id).count()
+        return count
+
+
+@receiver(post_save, sender=Interaction)
+def update_attending(sender, instance, created, **kwargs):
+    if created:
+        # % 2 == 0 represents even interactions
+        if instance.count_student_interactions(instance.student_id) % 2 == 0:
+            instance.student.attending = False
+        else:
+            instance.student.attending = True
+        instance.student.save()
 
 
 class Motion(models.Model):
