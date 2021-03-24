@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -5,6 +6,7 @@ from django.views import generic
 
 from django.shortcuts import render
 from .models import Motion, Choice
+import scannvote.settings as settings
 
 
 class IndexView(generic.ListView):
@@ -25,6 +27,7 @@ class ResultsView(generic.DetailView):
     template_name = 'cgeassembly/results.html'
 
 
+@login_required(login_url=settings.LOGIN_URL)
 def vote(request, motion_id):
     motion = get_object_or_404(Motion, pk = motion_id)
     try:

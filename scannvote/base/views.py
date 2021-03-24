@@ -5,11 +5,12 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from .forms import SignUpForm, LoginForm
+import scannvote.settings as settings
 
 # Create your views here.
 
 
-@login_required(login_url='/login')
+@login_required(login_url=settings.LOGIN_URL)
 def home(request):
     return render(request, 'base/home.html')
 

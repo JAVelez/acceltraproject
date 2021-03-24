@@ -5,6 +5,7 @@ from django.dispatch import receiver
 
 
 class Student(models.Model):
+    # TODO consultar con el cge para las opciones (if any)
     faculty_choices = {
         ('ingenieria', 'ingeniería'),
         ('biologia', 'biología'),
