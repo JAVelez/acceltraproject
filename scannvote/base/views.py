@@ -5,7 +5,6 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from .forms import SignUpForm, LoginForm
-from .models import Student
 
 # Create your views here.
 
