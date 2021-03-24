@@ -56,7 +56,7 @@ class Interaction(models.Model):
     # id = models.BigIntegerField(primary_key=True)
     student = models.ForeignKey(base.Student, on_delete=models.CASCADE)
     timestamp = models.DateTimeField('date interacted', default=timezone.now)
-    assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
+    assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE, limit_choices_to={'archived': False})
 
     def count_student_interactions(self, student_id):
         count = Interaction.objects.filter(student_id=student_id).count()

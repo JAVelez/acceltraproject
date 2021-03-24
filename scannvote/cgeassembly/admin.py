@@ -25,7 +25,16 @@ class AssemblyAdmin(admin.ModelAdmin):
 
 
 class InteractionAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ('Required Fields', {'fields': ['student', 'timestamp', 'assembly']}),
+    ]
+
     list_display = ['student', 'timestamp', 'assembly']
+
+    # def assembly_options(self, obj):
+    #     return obj
+    #
+    # assembly_options.admin_order_field = ''
 
 
 admin.site.register(Motion, MotionAdmin)
