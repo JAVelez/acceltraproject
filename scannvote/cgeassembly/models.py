@@ -34,6 +34,8 @@ class Interaction(models.Model):
     student = models.OneToOneField(base.Student, on_delete=models.CASCADE, primary_key=True)
     timestamp = models.DateTimeField('date interacted', default=timezone.now)
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
+    # TODO consider moving this attribute to student model and updating according
+    #  to latest daily interaction interaction
     attending = models.BooleanField()
 
     def update_quorum(self):
