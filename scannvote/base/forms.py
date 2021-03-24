@@ -12,6 +12,7 @@ numeric = RegexValidator(r'\d{9}', 'Only digit characters.')
 class SignUpForm(UserCreationForm):
     error_messages = {
         'student_id_taken': 'Student ID already has an account.',
+        'password_mismatch': 'Passwords do not match.'
     }
 
     student_id = forms.CharField(help_text='Required. Format: xxxxxxxxx',
@@ -20,13 +21,12 @@ class SignUpForm(UserCreationForm):
                                              numeric])
 
     def clean_student_id(self):
-        student_id = self.cleaned_data.get("student_id")
+        student_id = self.data.get("student_id")
         if Student.student_exists(Student, student_id):
             raise ValidationError(
                 self.error_messages['student_id_taken'],
             )
         return student_id
-
 
     class Meta:
         model = User
