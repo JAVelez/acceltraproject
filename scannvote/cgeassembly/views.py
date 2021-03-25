@@ -14,7 +14,7 @@ class IndexView(generic.ListView):
     context_object_name = 'latest_motion_list'
 
     def get_queryset(self):
-        return Motion.objects.order_by('-pub_date')[:5]
+        return Motion.objects.order_by('-date')[:5]
 
 
 class DetailView(generic.DetailView):

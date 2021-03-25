@@ -17,13 +17,10 @@ class Assembly(models.Model):
     def __str__(self):
         return self.assembly_name
 
-    def get_attendee_list(self):
+    @staticmethod
+    def get_attendee_list():
         attendee_list = base.Student.objects.filter(attending=True)
         return attendee_list
-
-    # def get_active_list(self):
-    #     active_list = self.get_attendee_list().order_by('timestamp').distinct('student')
-    #     return active_list
 
     def get_quorum_count(self):
         quorum = self.get_attendee_list().count()
@@ -32,33 +29,17 @@ class Assembly(models.Model):
     def update_quorum(self):
         self.quorum = self.get_quorum_count()
 
-    def get_prev_assembly(self):
-        qs = Assembly.objects.order_by('-date')
-        if len(qs) == 1:
-            return None
-        else:
-            return qs[1]
-
     class Meta:
         verbose_name_plural = "Assemblies"
 
-# TODO adaptar método para assembly y motion y ammendment lmao
-@receiver(post_save, sender=Assembly)
-def update_assembly_archive(sender, instance, created, **kwargs):
-    if created:
-        assembly_to_archive = instance.get_prev_assembly()
-        if assembly_to_archive:
-            assembly_to_archive.archived = True
-            assembly_to_archive.save()
-
 
 class Interaction(models.Model):
-    # id = models.BigIntegerField(primary_key=True)
     student = models.ForeignKey(base.Student, on_delete=models.CASCADE)
     timestamp = models.DateTimeField('date interacted', default=timezone.now)
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE, limit_choices_to={'archived': False})
 
-    def count_student_interactions(self, student_id):
+    @staticmethod
+    def count_student_interactions(student_id):
         count = Interaction.objects.filter(student_id=student_id).count()
         return count
 
@@ -66,7 +47,7 @@ class Interaction(models.Model):
 @receiver(post_save, sender=Interaction)
 def update_attending(sender, instance, created, **kwargs):
     if created:
-        # % 2 == 0 represents even interactions
+        # % 2 == 0 represents even interactions :: leaving the assembly
         if instance.count_student_interactions(instance.student_id) % 2 == 0:
             instance.student.attending = False
         else:
@@ -75,19 +56,18 @@ def update_attending(sender, instance, created, **kwargs):
 
 
 class Motion(models.Model):
-    assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE, default="")
+    assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE, limit_choices_to={'archived': False})
     motion_text = models.CharField(max_length=500)
-    pub_date = models.DateTimeField('date published', default=timezone.now)
-    # 1 = true; 0 = false
-    current_motion = models.IntegerField(default=1)
-    open_to_vote = models.IntegerField(default=0)
+    date = models.DateTimeField('date published', default=timezone.now)
+    archived = models.BooleanField(default=False)
+    voteable = models.BooleanField(default=False)
 
     # # alt to manual opening and closing
     # open_date = models.DateTimeField('date opened to vote')
     # closing_date = models.DateTimeField('date closed to vote')
 
     def __str__(self):
-        return self.motion_text
+        return self.motion_text[:30] + "..."
 
 
 class Choice(models.Model):
@@ -102,3 +82,27 @@ class Choice(models.Model):
 
     def __str__(self):
         return self.choice_text
+
+
+class Amendment(Motion):
+    motion_amended = models.ForeignKey(Motion, on_delete=models.CASCADE,
+                                       related_name='original_motion',
+                                       limit_choices_to={'archived': False})
+
+
+def get_prev_model(model):
+    qs = model.objects.order_by('-date')
+    if len(qs) == 1:
+        return None
+    else:
+        return qs[1]
+
+
+@receiver(post_save, sender=Motion)
+@receiver(post_save, sender=Assembly)
+def update_model_archive(sender, instance, created, **kwargs):
+    if created:
+        model_to_archive = get_prev_model(sender)
+        if model_to_archive:
+            model_to_archive.archived = True
+            model_to_archive.save()

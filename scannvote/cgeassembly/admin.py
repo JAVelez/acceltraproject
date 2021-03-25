@@ -1,6 +1,10 @@
 from django.contrib import admin
 
-from .models import Assembly, Motion, Choice, Interaction
+from .models import Assembly, Motion, Choice, Interaction, Amendment
+
+
+class AssemblyAdmin(admin.ModelAdmin):
+    list_display = ['assembly_name', 'date', 'quorum']
 
 
 class ChoicesInLine(admin.TabularInline):
@@ -12,16 +16,24 @@ class MotionAdmin(admin.ModelAdmin):
     # changeview
     fieldsets = [
         ('Required Fields', {'fields': ['assembly', 'motion_text', ]}),
-        ('Ability to vote', {'fields': ['current_motion', 'open_to_vote']}),
-        ('Date information', {'fields': ['pub_date']}),
+        ('Ability to vote', {'fields': ['voteable']}),
+        ('Date information', {'fields': ['date', 'archived']}),
     ]
     inlines = [ChoicesInLine]
     # changelistview
-    list_display = ['motion_text', 'pub_date']
+    list_display = ['motion_text', 'date', 'assembly']
 
 
-class AssemblyAdmin(admin.ModelAdmin):
-    list_display = ['assembly_name', 'date', 'quorum']
+class AmendmentAdmin(admin.ModelAdmin):
+    # changeview
+    fieldsets = [
+        ('Required Fields', {'fields': ['assembly', 'motion_amended', 'motion_text', ]}),
+        ('Ability to vote', {'fields': ['voteable']}),
+        ('Date information', {'fields': ['date', 'archived']}),
+    ]
+    inlines = [ChoicesInLine]
+    # changelistview
+    list_display = ['motion_text', 'date', 'assembly']
 
 
 class InteractionAdmin(admin.ModelAdmin):
@@ -31,12 +43,8 @@ class InteractionAdmin(admin.ModelAdmin):
 
     list_display = ['student', 'timestamp', 'assembly']
 
-    # def assembly_options(self, obj):
-    #     return obj
-    #
-    # assembly_options.admin_order_field = ''
 
-
-admin.site.register(Motion, MotionAdmin)
 admin.site.register(Assembly, AssemblyAdmin)
+admin.site.register(Motion, MotionAdmin)
+admin.site.register(Amendment, AmendmentAdmin)
 admin.site.register(Interaction, InteractionAdmin)
