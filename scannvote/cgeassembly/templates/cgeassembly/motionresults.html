@@ -1,7 +1,10 @@
-<h1>{{ motion.motion_text }}</h1>
+{% extends 'base/base.html' %}
 
-<ul>
-{% for choice in motion.choice_set.all %}
-    <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
-{% endfor %}
-</ul>
+{% block content %}
+    <h1>{{ motion.motion_text }}</h1>
+    <ul>
+    {% for choice in motion.choice_set.all %}
+        <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}
