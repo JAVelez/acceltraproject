@@ -69,6 +69,8 @@ class Motion(models.Model):
     def __str__(self):
         return self.motion_text[:30] + "..."
 
+# TODO crear modelo "vote" con foreign keys de user y motion :)
+
 
 class Choice(models.Model):
     choices = {

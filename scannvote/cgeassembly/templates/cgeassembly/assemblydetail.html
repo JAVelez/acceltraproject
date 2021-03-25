@@ -1,0 +1,21 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+    <h1>{{ assembly }}</h1>
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+    <ul>
+        <li>Date: {{assembly.date}}</li>
+        <li>Quorum: {{assembly.quorum}}</li>
+        <li>Agenda: {{assembly.agenda}}</li>
+    </ul>
+
+    <h2>Motions</h2>
+    <ul>
+    {% for motion in assembly.motion_set.all %}
+        <li><a href= "{% url 'cgeassembly:motiondetail' motion.id %}">{{ motion.motion_text }}</a></li>
+    {% endfor %}
+    </ul>
+
+
+
+{% endblock %}

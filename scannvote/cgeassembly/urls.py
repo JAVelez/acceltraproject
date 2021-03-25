@@ -5,11 +5,17 @@ from . import views
 app_name = 'cgeassembly'
 urlpatterns = [
     # ex: /cgeassembly/
-    path('', views.IndexView.as_view(), name='index'),
-    # ex: /cgeassembly/5/
-    path('<int:pk>/', views.DetailView.as_view(), name='detail'),
-    # ex: /cgeassembly/5/results/
-    path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
-    # ex: /cgeassembly/5/vote/
-    path('<int:motion_id>/vote/', views.vote, name='vote'),
+    path('', views.AssemblyIndexView.as_view(), name='assemblyindex'),
+    # ex: /cgeassembly/1
+    path('<int:pk>/', views.AssemblyDetailView.as_view(), name='assemblydetail'),
+
+    # # ex: /cgeassembly/
+    # path('', views.MotionIndexView.as_view(), name='motionindex'),
+
+    # ex: /assembly/cgeassembly/5/
+    path('assembly/<int:pk>/', views.MotionDetailView.as_view(), name='motiondetail'),
+    # ex: /assembly/cgeassembly/5/results/
+    path('assembly/<int:pk>/results/', views.MotionResultsView.as_view(), name='motionresults'),
+    # ex: /assembly/cgeassembly/5/vote/
+    path('assembly/<int:motion_id>/vote/', views.vote, name='vote'),
 ]
