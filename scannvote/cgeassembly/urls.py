@@ -9,9 +9,6 @@ urlpatterns = [
     # ex: /cgeassembly/1
     path('<int:pk>/', views.AssemblyDetailView.as_view(), name='assemblydetail'),
 
-    # # ex: /cgeassembly/
-    # path('', views.MotionIndexView.as_view(), name='motionindex'),
-
     # ex: /assembly/cgeassembly/5/
     path('assembly/<int:pk>/', views.MotionDetailView.as_view(), name='motiondetail'),
     # ex: /assembly/cgeassembly/5/results/

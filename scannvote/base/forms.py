@@ -22,7 +22,7 @@ class SignUpForm(UserCreationForm):
 
     def clean_student_id(self):
         student_id = self.data.get("student_id")
-        if Student.student_exists(Student, student_id):
+        if Student.student_exists(student_id):
             raise ValidationError(
                 self.error_messages['student_id_taken'],
             )

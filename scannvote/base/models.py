@@ -21,8 +21,13 @@ class Student(models.Model):
     def __str__(self):
         return self.student_id
 
-    def student_exists(self, sid):
+    @staticmethod
+    def student_exists(sid):
         return Student.objects.filter(student_id=sid)
+
+    @staticmethod
+    def get_student_by_user(user):
+        return Student.objects.get(user=user)
 
 
     # if count % 2 == 0:

@@ -67,9 +67,28 @@ class Motion(models.Model):
     # closing_date = models.DateTimeField('date closed to vote')
 
     def __str__(self):
-        return self.motion_text[:30] + "..."
+        return self.motion_text
+
 
 # TODO crear modelo "vote" con foreign keys de user y motion :)
+class Vote(models.Model):
+    student = models.ForeignKey(base.Student, on_delete=models.CASCADE)
+    motion = models.ForeignKey(Motion, on_delete=models.CASCADE)
+
+
+def create_vote(motion, student):
+    if not vote_exists(motion, student):
+        vote = Vote(student=student, motion=motion)
+        vote.save()
+        return vote
+    return None
+
+
+def vote_exists(motion, student):
+    try:
+        return Vote.objects.get(motion=motion, student=student)
+    except:
+        return None
 
 
 class Choice(models.Model):

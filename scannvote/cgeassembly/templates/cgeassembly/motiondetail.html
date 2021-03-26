@@ -3,13 +3,17 @@
 {% block content %}
     <h1>{{ motion }}</h1>
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
-    <form action = "{% url 'cgeassembly:vote' motion.id %}" method = "post">
-    {% csrf_token %}
-    {% for choice in motion.choice_set.all %}
-        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
-    {% endfor %}
-    <input type="submit" value="Vote">
-    </form>
+    {% if motion.voteable %}
+        <form action = "{% url 'cgeassembly:vote' motion.id %}" method = "post">
+        {% csrf_token %}
+        {% for choice in motion.choice_set.all %}
+            <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+            <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+        {% endfor %}
+        {{form.non_field_errors}}
+        <input type="submit" value="Vote">
+        </form>
+    {% else %} <h3>Voting is not open at the moment</h3>
+    {%endif%}
+    <a href= "{% url 'cgeassembly:motionresults' motion.id %}">View Results</a>
 {% endblock %}
