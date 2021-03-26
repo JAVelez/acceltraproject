@@ -36,10 +36,12 @@ def signup(request):
 def login_student(request):
     if request.method == 'POST':
         user = authenticate(username=request.POST['username'], password=request.POST['password'])
-        login(request, user)
-        return HttpResponseRedirect(reverse('home'))
-    else:
-        form = LoginForm()
+        if user:
+            login(request, user)
+            return HttpResponseRedirect(reverse('home'))
+        else:
+            return render(request, 'base/login_failed.html', {'form': LoginForm()})
+    form = LoginForm()
     return render(request, 'base/login.html', {'form': form})
 
 
