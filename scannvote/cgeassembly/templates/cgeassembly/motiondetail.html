@@ -16,4 +16,12 @@
     {% else %} <h3>Voting is not open at the moment</h3>
     {%endif%}
     <a href= "{% url 'cgeassembly:motionresults' motion.id %}">View Results</a>
+    <h2>Amendments</h2>
+        {% if motion.original_motion.all %}
+            {% for amendment in motion.original_motion.all %}
+                <li><a href= "{% url 'cgeassembly:motiondetail' amendment.id %}">{{ amendment.motion_text }}</a></li>
+            {% endfor %}
+        {% else %} <p>No amendments</p>
+        {%endif%}
+
 {% endblock %}

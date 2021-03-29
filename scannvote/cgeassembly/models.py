@@ -70,7 +70,6 @@ class Motion(models.Model):
         return self.motion_text
 
 
-# TODO crear modelo "vote" con foreign keys de user y motion :)
 class Vote(models.Model):
     student = models.ForeignKey(base.Student, on_delete=models.CASCADE)
     motion = models.ForeignKey(Motion, on_delete=models.CASCADE)

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Assembly, Motion, Choice, Interaction, Amendment
+from .models import Assembly, Choice, Interaction, Motion, Amendment
 
 
 class AssemblyAdmin(admin.ModelAdmin):

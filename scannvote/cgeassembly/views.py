@@ -27,12 +27,12 @@ class AssemblyDetailView(generic.DetailView):
         return Assembly.objects.order_by('-date')
 
 
-class MotionIndexView(generic.ListView):
-    template_name = 'cgeassembly/motionindex.html'
-    context_object_name = 'latest_motion_list'
-
-    def get_queryset(self):
-        return Motion.objects.order_by('-date')[:5]
+# class MotionIndexView(generic.ListView):
+#     template_name = 'cgeassembly/motionindex.html'
+#     context_object_name = 'latest_motion_list'
+#
+#     def get_queryset(self):
+#         return Motion.objects.order_by('-date')[:5]
 
 
 class MotionDetailView(generic.DetailView):
@@ -43,7 +43,6 @@ class MotionDetailView(generic.DetailView):
 class MotionResultsView(generic.DetailView):
     model = Motion
     template_name = 'cgeassembly/motionresults.html'
-    # TODO hide vote results if voteable == True
 
 
 @login_required(login_url=settings.LOGIN_URL)
