@@ -28,4 +28,6 @@ urlpatterns = [
     path(r'login/', views.login_student, name='login'),
     #  ex: /logout
     path(r'logout/', views.logout_student, name='logout'),
+    #  ex: /accounts
+    path('accounts/', include('django.contrib.auth.urls')),
 ]

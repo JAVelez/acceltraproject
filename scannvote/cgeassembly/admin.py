@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Assembly, Motion, Choice
+from .models import Assembly, Motion, Choice, Agenda
 
 
 class ChoicesInLine(admin.TabularInline):
@@ -19,8 +19,13 @@ class MotionAdmin(admin.ModelAdmin):
 
 
 class AssemblyAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['assembly_name', 'current_point']
+
+
+class AgendaAdmin(admin.ModelAdmin):
+    list_display = ['assembly', 'agenda_point', 'current_point']
 
 
 admin.site.register(Assembly, AssemblyAdmin)
 admin.site.register(Motion, MotionAdmin)
+admin.site.register(Agenda, AgendaAdmin)

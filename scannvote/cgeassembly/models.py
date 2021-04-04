@@ -8,7 +8,8 @@ class Assembly(models.Model):
     assembly_name = models.CharField(max_length=200, default="")
     date = models.DateTimeField('event date')
     quorum = models.IntegerField(default=0, editable=False)
-    agenda = models.CharField(max_length=500, default="Placeholder")
+    agenda_fill = models.TextField(default="")  #.CharField(max_length=500, default="Placeholder")
+    current_point = models.CharField(max_length=200, default="")
 
     def __str__(self):
         return self.assembly_name
@@ -45,3 +46,13 @@ class Choice(models.Model):
 
     def __str__(self):
         return self.choice_text
+
+
+class Agenda(models.Model):
+    choices = {('true', 'actual'),
+               ('false', 'no actual'),}
+    assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE, default="") #models.CharField(max_length=20, default="")
+    #assemblyName = models.CharField(max_length=100, default="") #Assembly.assembly_name
+    agenda_point = models.CharField(max_length=100, default="")
+    current_point = models.CharField(max_length=20, choices=choices, default='false')
+
