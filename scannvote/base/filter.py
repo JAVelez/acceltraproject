@@ -4,7 +4,7 @@ from .models import Student
 
 
 class isPresentFilter(admin.SimpleListFilter):
-    title = 'Estudiantes Presente'
+    title = 'Students in Assembly'
     parameter_name = 'isPresent'
     default_value = ""
 
@@ -17,11 +17,14 @@ class isPresentFilter(admin.SimpleListFilter):
         in the right sidebar.
         """
         list_of_student = []
+        options = ['false', 'true']
         queryset = Student.objects.all()
         for student in queryset:
-            list_of_student.append(
-                (str(student.is_present), student.is_present)
-            )
+            if student.is_present in options:
+                list_of_student.append(
+                    (str(student.is_present), student.is_present)
+                )
+                options.remove(student.is_present)
         return sorted(list_of_student, key=lambda tp: tp[1])
 
     def queryset(self, request, queryset):
