@@ -1,6 +1,6 @@
 from django.test import LiveServerTestCase
 from selenium import webdriver
-from .models import Assembly, Motion, Amendment, Choice
+from .models import Assembly, Motion, Amendment, Choice, Interaction
 import base.tests as base
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -95,8 +95,9 @@ class CgeassemblyTestCases(LiveServerTestCase):
 
         # user enters the assembly and "is attending"
         user = User.objects.get()
-        user.student.attending = True
-        user.save()
+        Interaction.objects.create(student=user.student, timestamp=timezone.now(), assembly=self.assembly1)
+        # user.student.attending = True
+        # user.save()
 
         WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, a_favor_radio)))
         self.browser.find_element_by_xpath(a_favor_radio).click()

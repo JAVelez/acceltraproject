@@ -15,19 +15,43 @@ signup_fail_student_id_gt_length = 5
 signup_fail_student_id_non_numeric = 6
 
 login_good = 0
-login_bad = 1
+login_bad_pw = 1
+login_bad_username = 2
+login_bad_both = 3
+
+good_username = 'gooduser1'
+good_student_id = '000000000'
+good_pw = 'GoodPW12'
+
+lt_student_id = '12345678'
+gt_student_id = '1234567890'
+char_student_id = '12345678a'
+bad_pw = 'password'
+bad_username = 'baduser'
 
 # represents good user registration
-good_student = {'username': 'gooduser1',
-                    'student_id': '000000000',
-                    'password1': 'GoodPW12',
-                    'password2': 'GoodPW12'}
+good_student = {'username': good_username, 'student_id': good_student_id, 'password1': good_pw, 'password2': good_pw}
 
-# represents bad user registration
-bad_student = {'username': 'gooduser1',
-                    'student_id': '000000000',
-                    'password1': 'GoodPW',
-                    'password2': 'GoodPW'}
+# represent bad user registrations
+student_mismatch_pw = {'username': good_username, 'student_id': good_student_id, 'password1': good_pw, 'password2': bad_pw}
+
+student_weak_pw = {'username': good_username, 'student_id': good_student_id, 'password1': bad_pw, 'password2': bad_pw}
+
+student_id_empty = {'username': good_username, 'student_id': '', 'password1': good_pw, 'password2': good_pw}
+
+student_id_lt = {'username': good_username, 'student_id': lt_student_id, 'password1': good_pw, 'password2': good_pw}
+
+student_id_gt = {'username': good_username, 'student_id': gt_student_id, 'password1': good_pw, 'password2': good_pw}
+
+student_id_char = {'username': good_username, 'student_id': char_student_id, 'password1': good_pw, 'password2': good_pw}
+
+# represent bad user logins
+
+bad_student_login_pw = {'username': good_username, 'password1': bad_pw}
+
+bad_student_login_username = {'username': bad_pw, 'password1': good_pw}
+
+bad_student_login_both = {'username': bad_username, 'password1': bad_pw}
 
 
 class StudentTestCases(LiveServerTestCase):
@@ -44,35 +68,17 @@ class StudentTestCases(LiveServerTestCase):
         if code == signup_good:
             form = good_student
         elif code == signup_fail_mismatch_pw:
-            form = {'username': 'tryhard1',
-                    'student_id': '123456789',
-                    'password1': 'GoodPW12',
-                    'password2': 'GoodPW123'}
+            form = student_mismatch_pw
         elif code == signup_fail_weak_password:
-            form = {'username': 'tryhard1',
-                    'student_id': '123456789',
-                    'password1': 'password1',
-                    'password2': 'password1'}
+            form = student_weak_pw
         elif code == signup_fail_student_id_empty:
-            form = {'username': 'tryhard1',
-                    'student_id': '',
-                    'password1': 'GoodPW12',
-                    'password2': 'GoodPW12'}
+            form = student_id_empty
         elif code == signup_fail_student_id_lt_length:
-            form = {'username': 'tryhard1',
-                    'student_id': '12345678',
-                    'password1': 'GoodPW12',
-                    'password2': 'GoodPW12'}
+            form = student_id_lt
         elif code == signup_fail_student_id_gt_length:
-            form = {'username': 'tryhard1',
-                    'student_id': '1234567890',
-                    'password1': 'GoodPW12',
-                    'password2': 'GoodPW12'}
+            form = student_id_gt
         elif code == signup_fail_student_id_non_numeric:
-            form = {'username': 'tryhard1',
-                    'student_id': '12345678a',
-                    'password1': 'GoodPW12',
-                    'password2': 'GoodPW12'}
+            form = student_id_char
         return form
 
     def signup_form_fill(self, code):
@@ -149,8 +155,14 @@ class StudentTestCases(LiveServerTestCase):
         """
         if code == login_good:
             form = good_student
+        elif code == login_bad_pw:
+            form = bad_student_login_pw
+        elif code == login_bad_username:
+            form = bad_student_login_username
+        elif code == login_bad_both:
+            form = bad_student_login_both
         else:
-            form = bad_student
+            pass
         self.browser.find_element_by_name('username').send_keys(form['username'])
         self.browser.find_element_by_name('password').send_keys(form['password1'])
         self.browser.find_element_by_name('login').click()
@@ -162,7 +174,15 @@ class StudentTestCases(LiveServerTestCase):
         """
         self.browser.get(self.live_server_url + login)
 
-        self.login_form_fill(login_bad)
+        self.login_form_fill(login_bad_pw)
+        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/p').text,
+                         'Your username and password didn\'t match. Please try again.')
+
+        self.login_form_fill(login_bad_username)
+        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/p').text,
+                         'Your username and password didn\'t match. Please try again.')
+
+        self.login_form_fill(login_bad_both)
         self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/p').text,
                          'Your username and password didn\'t match. Please try again.')
 
