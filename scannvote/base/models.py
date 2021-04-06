@@ -5,6 +5,13 @@ from django.dispatch import receiver
 
 
 class Student(models.Model):
+    """
+    model to add student values not found in Django's user model
+    :param: user: one to one relation to Django's user model to use their authentication with added values
+    :param: student_id: student id number
+    :param: faculty: faculty to which the student belongs to
+    :param: attending: will alternate from False and True depending if the student is attending an assembly
+    """
     # TODO consultar con el cge para las opciones (if any)
     faculty_choices = {
         ('none', 'none'),
@@ -30,14 +37,17 @@ class Student(models.Model):
         return Student.objects.get(user=user)
 
 
-    # if count % 2 == 0:
-    #     self.attending = True
-    # else:
-    #     self.attending = False
-
-
 @receiver(post_save, sender=User)
 def update_user_profile(sender, instance, created, **kwargs):
+    """
+    method that is called when Django sends the signal a User is created to also create the student and relate it to
+    the user just created
+    :param sender: model who sends the signal
+    :param instance: object that has sent the signal
+    :param created: determines if the User was created successfully
+    :param kwargs:
+    :return:
+    """
     if created:
         Student.objects.create(user=instance)
     instance.student.save()
