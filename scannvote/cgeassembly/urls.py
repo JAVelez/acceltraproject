@@ -7,7 +7,7 @@ urlpatterns = [
     # ex: /cgeassembly/
     path('', views.AssemblyIndexView.as_view(), name='assemblyindex'),
     # ex: /cgeassembly/1
-    path('<int:pk>/', views.AssemblyDetailView.as_view(), name='assemblydetail'),
+    path('<int:pk>/', views.AssemblyDetailView, name='assemblydetail'),
 
     # ex: /assembly/cgeassembly/5/
     path('assembly/<int:pk>/', views.MotionDetailView.as_view(), name='motiondetail'),

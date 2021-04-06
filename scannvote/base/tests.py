@@ -35,9 +35,6 @@ class StudentTestCases(LiveServerTestCase):
         path = 'C:/Users/xboxa/PycharmProjects/acceltraProject/scannvote/webdriver/chromedriver.exe'
         self.browser = webdriver.Chrome(executable_path=path)
 
-    def tearDown(self):
-        self.browser.close()
-
     def signup_form_content(self, code):
         """
         method to return different validation errors and 1 successful registration at signup

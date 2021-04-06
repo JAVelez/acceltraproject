@@ -11,7 +11,7 @@
 
     <h2>Motions</h2>
     <ul>
-    {% for motion in assembly.motion_set.all %}
+    {% for motion in motion_set.all %}
         <li><a href= "{% url 'cgeassembly:motiondetail' motion.id %}">{{ motion.motion_text }}</a></li>
     {% endfor %}
     </ul>

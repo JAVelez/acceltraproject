@@ -41,9 +41,6 @@ class CgeassemblyTestCases(LiveServerTestCase):
         self.motion1.save()
         self.choices_creation(self.motion1)
 
-    def tearDown(self):
-        self.browser.close()
-
     def anon_user_run(self):
         """
         method that represents an anonymous user requesting access to view information and a failed attempt to vote

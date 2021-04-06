@@ -22,15 +22,14 @@ class AssemblyIndexView(generic.ListView):
         return Assembly.objects.order_by('-date')
 
 
-class AssemblyDetailView(generic.DetailView):
+def AssemblyDetailView(request, pk):
     """
     view that returns the details of the selected assembly object
     """
-    template_name = 'cgeassembly/assemblydetail.html'
-    context_object_name = 'assembly'
-
-    def get_queryset(self):
-        return Assembly.objects.order_by('-date')
+    assembly = get_object_or_404(Assembly, pk=pk)
+    motion_set = Motion.objects.filter(assembly=assembly, amendment=None)
+    return render(request, 'cgeassembly/assemblydetail.html',
+                  {'assembly': assembly, 'motion_set': motion_set, })
 
 
 class MotionDetailView(generic.DetailView):
