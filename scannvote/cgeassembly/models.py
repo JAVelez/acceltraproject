@@ -72,8 +72,8 @@ class Interaction(models.Model):
         :param student_id: student id
         :return: quantity of student interactions in that assembly
         """
-        # TODO verify it only considers current assembly's/current day interactions
-        count = Interaction.objects.filter(student_id=student_id).count()
+        current_assembly = Assembly.objects.get(archived=False)
+        count = Interaction.objects.filter(student_id=student_id, assembly=current_assembly).count()
         return count
 
 
@@ -212,3 +212,7 @@ def update_model_archive(sender, instance, created, **kwargs):
         if model_to_archive:
             model_to_archive.archived = True
             model_to_archive.save()
+
+
+# TODO create action (admin side) to "close" assemblies where all users' attending = False & assembly.archive = True
+
