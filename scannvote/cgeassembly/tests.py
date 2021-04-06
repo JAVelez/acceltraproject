@@ -96,8 +96,6 @@ class CgeassemblyTestCases(LiveServerTestCase):
         # user enters the assembly and "is attending"
         user = User.objects.get()
         Interaction.objects.create(student=user.student, timestamp=timezone.now(), assembly=self.assembly1)
-        # user.student.attending = True
-        # user.save()
 
         WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, a_favor_radio)))
         self.browser.find_element_by_xpath(a_favor_radio).click()
