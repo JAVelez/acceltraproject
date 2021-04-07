@@ -92,9 +92,12 @@ def update_attending(sender, instance, created, **kwargs):
         # % 2 == 0 represents even interactions :: leaving the assembly
         if instance.count_student_interactions(instance.student_id) % 2 == 0:
             instance.student.attending = False
+            instance.assembly.quorum = instance.assembly.quorum - 1
         else:
             instance.student.attending = True
+            instance.assembly.quorum = instance.assembly.quorum + 1
         instance.student.save()
+        instance.assembly.save()
 
 
 class Motion(models.Model):
