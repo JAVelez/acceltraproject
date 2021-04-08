@@ -29,7 +29,7 @@ class SignUpForm(UserCreationForm):
         verifies if student id is taken
         :return: student id number
         """
-        student_id = self.data.get("student_id")
+        student_id = self.data.get("student_id").strip()
         if Student.student_exists(student_id):
             raise ValidationError(
                 self.error_messages['student_id_taken'],

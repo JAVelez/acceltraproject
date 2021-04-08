@@ -5,10 +5,12 @@ from django.urls import reverse
 from django.views import generic
 
 from django.shortcuts import render
-from .models import Motion, Choice, Assembly, Vote
+from .models import Motion, Choice, Assembly, Vote, Interaction
 import scannvote.settings as settings
 import base.models as base
 from . import models
+from .forms import EntryForm
+
 
 
 class AssemblyIndexView(generic.ListView):
@@ -85,4 +87,29 @@ def vote(request, motion_id):
                           {'motion': motion, 'error_message': "You have already cast your vote.",})
         return HttpResponseRedirect(reverse('cgeassembly:motionresults', args=(motion.id,)))
 
+
+# TODO only staff members can access these url's
+def scanner(request):
+    if request.method == 'POST':
+        form = EntryForm(request.POST)
+        if form.is_valid():
+            student_id = form.clean_student_id()
+            student = base.Student.get_student_by_student_id(student_id)
+            assembly = Assembly.get_current_assembly()
+            if student and assembly:
+                Interaction.objects.create(student=student, assembly=assembly)
+                if Interaction.count_student_interactions(student.id) % 2 - 1 == 0:
+                    attending = False
+                else:
+                    attending = True
+                return render(request, 'cgeassembly/scanner.html', {'form': EntryForm(),
+                                                                    'success': True,
+                                                                    'attending': attending})
+            else:
+                return render(request, 'cgeassembly/scanner.html', {'form': form,
+                                                                    'success': False,
+                                                                    'error_message': 'Student id is not in the database.'})
+    else:
+        form = EntryForm()
+    return render(request, 'cgeassembly/scanner.html', {'form': form})
 

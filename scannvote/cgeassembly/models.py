@@ -50,6 +50,10 @@ class Assembly(models.Model):
         """
         self.quorum = self.get_quorum_count()
 
+    @staticmethod
+    def get_current_assembly():
+        return Assembly.objects.filter(archived=False).first()
+
     class Meta:
         verbose_name_plural = "Assemblies"
 
@@ -66,14 +70,14 @@ class Interaction(models.Model):
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE, limit_choices_to={'archived': False})
 
     @staticmethod
-    def count_student_interactions(student_id):
+    def count_student_interactions(student_pk):
         """
         helper method to return the amount of times a student has passed by the scanning station
         :param student_id: student id
         :return: quantity of student interactions in that assembly
         """
         current_assembly = Assembly.objects.get(archived=False)
-        count = Interaction.objects.filter(student_id=student_id, assembly=current_assembly).count()
+        count = Interaction.objects.filter(student_id=student_pk, assembly=current_assembly).count()
         return count
 
 

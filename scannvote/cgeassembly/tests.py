@@ -95,6 +95,7 @@ class CgeassemblyTestCases(LiveServerTestCase):
 
         # user enters the assembly and "is attending"
         user = User.objects.get()
+        # TODO ADD scan_student(user.student.student_id) to test admin scanner portal
         Interaction.objects.create(student=user.student, timestamp=timezone.now(), assembly=self.assembly1)
 
         WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, a_favor_radio)))

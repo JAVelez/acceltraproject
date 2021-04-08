@@ -1,0 +1,30 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<h1>This is the scanner portal for admins</h1>
+  {% if success %}
+    {% if attending %}
+      <h3> <span style = "background-color: #ff6e6e"> Student has stopped attending</span></h3>
+    {% else %}
+      <h3> <span style = "background-color: #6dff6d"> Student has started attending</span></h3>
+    {% endif %}
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}" />
+    {% for field in form %}
+      <p>
+        {{ field.label_tag }}<br>
+        {{ field }}<br>
+        {% for error in field.errors %}
+          <p style="color: red">{{ error }}</p>
+        {% endfor %}
+        {% if field.help_text %}
+          <p><small style="color: grey">{{ field.help_text }}</small></p>
+        {% endif %}
+      </p>
+    {% endfor %}
+    <button name = "scanner" type="submit">Student Scan</button>
+  </form>
+
+{% endblock %}
