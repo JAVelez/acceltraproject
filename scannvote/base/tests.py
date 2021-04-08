@@ -23,6 +23,9 @@ good_username = 'gooduser1'
 good_student_id = '000000000'
 good_pw = 'GoodPW12'
 
+good_admin = 'goodadmin1'
+good_admin_id = '000000001'
+
 lt_student_id = '12345678'
 gt_student_id = '1234567890'
 char_student_id = '12345678a'
@@ -31,6 +34,9 @@ bad_username = 'baduser'
 
 # represents good user registration
 good_student = {'username': good_username, 'student_id': good_student_id, 'password1': good_pw, 'password2': good_pw}
+
+# represents good admin registration
+good_admin = {'username': good_admin, 'student_id': good_admin_id, 'password1': good_pw, 'password2': good_pw}
 
 # represent bad user registrations
 student_mismatch_pw = {'username': good_username, 'student_id': good_student_id, 'password1': good_pw, 'password2': bad_pw}

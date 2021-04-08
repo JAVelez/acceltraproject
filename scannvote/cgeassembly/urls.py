@@ -17,6 +17,4 @@ urlpatterns = [
 
     # ex: /cgeassembly/scanner
     path('scanner/', views.scanner, name='scanner'),
-    # ex: /cgeassembly/scanner/scan
-    # path('scanner/scan/', views.scan, name='scan'),
 ]

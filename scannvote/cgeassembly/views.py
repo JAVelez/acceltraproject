@@ -90,6 +90,11 @@ def vote(request, motion_id):
 
 # TODO only staff members can access these url's
 def scanner(request):
+    """
+    scanner view only accessible if admin is logged in and will process their request to scan a student id card
+    :param request: http request containing their student_id
+    :return: if successful, redirects to scanner page, if not, returns an appropriate error message
+    """
     if request.method == 'POST':
         form = EntryForm(request.POST)
         if form.is_valid():

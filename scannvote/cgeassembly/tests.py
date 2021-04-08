@@ -2,6 +2,7 @@ from django.test import LiveServerTestCase
 from selenium import webdriver
 from .models import Assembly, Motion, Amendment, Choice, Interaction
 import base.tests as base
+import base.models as basemodels
 from django.contrib.auth.models import User
 from django.utils import timezone
 from selenium.webdriver.support.ui import WebDriverWait
@@ -27,6 +28,8 @@ a_favor_results = '/html/body/main/ul/li[1]'
 en_contra_results = '/html/body/main/ul/li[2]'
 no_amendments = '/html/body/main/p'
 no_amendments_text = 'No amendments'
+student_id_form = '//*[@id="id_student_id"]'
+scanner_submit_btn = '/html/body/main/form/button'
 
 
 class CgeassemblyTestCases(LiveServerTestCase):
@@ -95,7 +98,6 @@ class CgeassemblyTestCases(LiveServerTestCase):
 
         # user enters the assembly and "is attending"
         user = User.objects.get()
-        # TODO ADD scan_student(user.student.student_id) to test admin scanner portal
         Interaction.objects.create(student=user.student, timestamp=timezone.now(), assembly=self.assembly1)
 
         WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, a_favor_radio)))
@@ -214,6 +216,48 @@ class CgeassemblyTestCases(LiveServerTestCase):
         Choice.objects.create(choice_text='en contra', motion=motion)
         Choice.objects.create(choice_text='abstenido', motion=motion)
 
+    def scan_student(self):
+        """
+        method that represents an admin scans a student id
+        :return: n/a
+        """
+
+        # signup + login admin
+        self.browser.get(self.live_server_url + '/signup')
+        base.signup_form(self.browser, base.good_admin)
+
+        # assign admin priv
+        admin = basemodels.Student.objects.all()[1].user
+        admin.is_superuser = True
+        admin.save()
+
+        self.browser.refresh()
+        self.browser.find_element_by_xpath('/html/body/main/a').click()
+
+        # test form decline a shorter student id
+        self.browser.find_element_by_xpath(student_id_form).send_keys(base.lt_student_id)
+        self.browser.find_element_by_xpath(scanner_submit_btn).click()
+        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/form/p[2]').text,
+                         'Ensure this value has at least 9 characters (it has 8).')
+        self.browser.find_element_by_xpath(student_id_form).clear()
+
+        # test form decline a longer student id
+        self.browser.find_element_by_xpath(student_id_form).send_keys(base.gt_student_id)
+        self.browser.find_element_by_xpath(scanner_submit_btn).click()
+        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/form/p[2]').text,
+                         'Ensure this value has at most 9 characters (it has 10).')
+        self.browser.find_element_by_xpath(student_id_form).clear()
+
+        # test form decline a student id including a char
+        self.browser.find_element_by_xpath(student_id_form).send_keys(base.char_student_id)
+        self.browser.find_element_by_xpath(scanner_submit_btn).click()
+        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/form/p[2]').text, 'Only digit characters.')
+        self.browser.find_element_by_xpath(student_id_form).clear()
+
+        # test form accept existing student
+        self.browser.find_element_by_xpath(student_id_form).send_keys(base.good_student_id)
+        self.browser.find_element_by_xpath(scanner_submit_btn).click()
+        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/h3/span').text, 'Student has stopped attending')
 
     def test_cgeassembly(self):
         """
@@ -222,4 +266,6 @@ class CgeassemblyTestCases(LiveServerTestCase):
         """
         self.anon_user_run()
         self.student_user_run()
+        self.scan_student()
+
 

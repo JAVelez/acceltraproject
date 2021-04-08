@@ -3,4 +3,7 @@
 {% block content %}
   <h2>Username: {{ user.get_username }}</h2>
   <p>Student ID: {{ user.student.student_id }}</p>
+  {% if user.is_staff or user.is_superuser %}
+    <a href="{% url 'cgeassembly:scanner' %}">Access the scanner interface</a>
+  {% endif %}
 {% endblock %}

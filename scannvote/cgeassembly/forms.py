@@ -23,7 +23,7 @@ class EntryForm(forms.ModelForm):
     def clean_student_id(self):
         """
         method to be called when cleaning form input within django's core functionalities
-        verifies if student id is taken
+        verifies if student id exists in the database
         :return: student id number
         """
         student_id = self.data.get("student_id").strip()
