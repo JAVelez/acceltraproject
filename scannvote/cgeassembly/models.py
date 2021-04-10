@@ -19,8 +19,18 @@ class Assembly(models.Model):
     assembly_name = models.CharField(max_length=200, default="")
     date = models.DateTimeField('event date')
     quorum = models.IntegerField(default=0, editable=False)
-    agenda = models.CharField(max_length=500, default="")
+    #quorum = get_quorum_count()
+    #agenda = models.TextField(max_length=1000, default="")
+    current_assembly = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
+
+    # def quorum(self, request, model_admin):
+    #     queryset = base.Student.objects.all()
+    #     for student in queryset:
+    #         if student.attending:
+    #             quorum = quorum + 1
+    #     return quorum
+
 
     def __str__(self):
         return self.assembly_name
@@ -218,4 +228,14 @@ def update_model_archive(sender, instance, created, **kwargs):
 
 
 # TODO create action (admin side) to "close" assemblies where all users' attending = False & assembly.archive = True
+
+
+class AgendaPoint(models.Model):
+    #choices = {('true', 'actual'),
+     #          ('false', 'no actual'),}
+    assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE) #models.CharField(max_length=20, default="")
+    agenda_point = models.CharField(max_length=100, default="")
+    current_point = models.BooleanField(default=False)
+    #current_point = models.CharField(max_length=20, choices=choices, default='false')
+    archived = models.BooleanField(default=False)
 
