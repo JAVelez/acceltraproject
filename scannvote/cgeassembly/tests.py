@@ -1,4 +1,5 @@
 from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from .models import Assembly, Motion, Amendment, Choice, Interaction
 import base.tests as base
@@ -14,25 +15,30 @@ from selenium.webdriver.common.by import By
 home = '/cgeassembly/'
 login_button = '/html/body/main/form/input[5]'
 
+# html items
 asamblea1_text = 'Asamblea General 1'
-asamblea1_link = '/html/body/main/ul/li/a'
+asamblea1_link = '/html/body/main/div/ul/li/a'
 mocion1_text = 'Moción para acabar capstone'
-mocion1_link = '/html/body/main/ul[2]/li/a'
+mocion1_link = '/html/body/main/div/ul[2]/li/a'
 mocion2_text = 'Moción #2 para acabar capstone pls'
-mocion2_link = '/html/body/main/ul[2]/li[2]/a'
-a_favor_radio = '/html/body/main/form/label[1]'
-en_contra_radio = '/html/body/main/form/label[2]'
-vote_button = '/html/body/main/form/input[5]'
-view_results_button = '/html/body/main/a'
-a_favor_results = '/html/body/main/ul/li[1]'
-en_contra_results = '/html/body/main/ul/li[2]'
-no_amendments = '/html/body/main/p'
+mocion2_link = '/html/body/main/div/ul[2]/li[2]/a'
+a_favor_radio_id = 'choice1'
+en_contra_radio = '/html/body/main/div/form/label[2]'
+vote_button_name = 'vote-btn'
+view_results_button = '/html/body/main/div/a'
+a_favor_results = '/html/body/main/div/ul/li[1]'
+en_contra_results = '/html/body/main/div/ul/li[2]'
+no_amendments_name = 'no-amendments-msg'
 no_amendments_text = 'No amendments'
 student_id_form = '//*[@id="id_student_id"]'
-scanner_submit_btn = '/html/body/main/form/button'
+scanner_submit_btn = '/html/body/main/div/form/button'
+
+vote_error_name = 'vote-error'
+vote_not_concluded_name = 'vote-not-concluded-msg'
+motion_name_desc = 'motion-desc'
 
 
-class CgeassemblyTestCases(LiveServerTestCase):
+class CgeassemblyTestCases(StaticLiveServerTestCase):
     def setUp(self):
         path = 'C:/Users/xboxa/PycharmProjects/acceltraProject/scannvote/webdriver/chromedriver.exe'
         self.browser = webdriver.Chrome(executable_path=path)
@@ -52,14 +58,14 @@ class CgeassemblyTestCases(LiveServerTestCase):
         self.navigate_to_motion(mocion1_link, mocion1_text)
 
         # Not voteable, anonymous user
-        self.assertEqual('Voting is not open at the moment',
-                         self.browser.find_element_by_xpath('/html/body/main/h3').text)
+        self.assertEqual(self.browser.find_element_by_name('voting-closed').text,
+                         'Voting is not open at the moment')
 
         # Voteable, anonymous user
         self.motion_is_now_voteable()
-        self.assert_(self.browser.find_element_by_xpath(login_button))
-        self.browser.find_element_by_xpath(login_button).click()
-        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/h2').text, 'Log in to My Site')
+        self.assert_(self.browser.find_element_by_xpath(base.login_redirect))
+        self.browser.find_element_by_xpath(base.login_redirect).click()
+        self.assertEqual(self.browser.find_element_by_xpath(base.login_redirect_confirmation).text, 'Login')
 
         print('Anonymous user run successful!')
 
@@ -83,39 +89,38 @@ class CgeassemblyTestCases(LiveServerTestCase):
         base.signup_form(self.browser, base.good_student)
 
         self.navigate_to_motion(mocion1_link, mocion1_text)
-        self.assertEqual('Voting is not open at the moment',
-                         self.browser.find_element_by_xpath('/html/body/main/h3').text)
+        self.assertEqual(self.browser.find_element_by_name('voting-closed').text,
+                         'Voting is not open at the moment')
 
         # motion is open to vote from the admin side
         self.motion1.voteable = True
         self.motion1.save()
         self.browser.refresh()
 
-        self.assertEqual('a favor', self.browser.find_element_by_xpath(a_favor_radio).text)
-        self.browser.find_element_by_xpath(vote_button).click()
-        self.assertEqual('You are not attending the assembly',
-                         self.browser.find_element_by_xpath('/html/body/main/p[1]/strong').text)
+        self.browser.find_element_by_id(a_favor_radio_id).click()
+        self.browser.find_element_by_name(vote_button_name).click()
+        self.assertEqual(self.browser.find_element_by_name(vote_error_name).text, 'You are not attending the assembly')
 
         # user enters the assembly and "is attending"
         user = User.objects.get()
         Interaction.objects.create(student=user.student, timestamp=timezone.now(), assembly=self.assembly1)
 
-        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, a_favor_radio)))
-        self.browser.find_element_by_xpath(a_favor_radio).click()
-        self.browser.find_element_by_xpath(vote_button).click()
+        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.ID, a_favor_radio_id)))
+        self.browser.find_element_by_id(a_favor_radio_id).click()
+        self.browser.find_element_by_name(vote_button_name).click()
 
         # voting has not concluded assertion
-        self.assertEqual('Voting has not concluded yet.', self.browser.find_element_by_xpath('/html/body/main/h3').text)
+        self.assertEqual('Voting has not concluded yet.', self.browser.find_element_by_name(vote_not_concluded_name).text)
 
         # try to vote twice
         self.browser.back()
         WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, en_contra_radio)))
         self.browser.find_element_by_xpath(en_contra_radio).click()
-        self.browser.find_element_by_xpath(vote_button).click()
+        self.browser.find_element_by_name(vote_button_name).click()
 
         # you cannot vote twice assertion
         self.assertEqual('You have already cast your vote.',
-                         self.browser.find_element_by_xpath('/html/body/main/p[1]/strong').text)
+                         self.browser.find_element_by_name(vote_error_name).text)
 
         # voting has conlcuded / closed by the cge through the admin side
         self.motion1.voteable = False
@@ -138,8 +143,8 @@ class CgeassemblyTestCases(LiveServerTestCase):
         self.assertTrue(Motion.objects.all()[0].archived)  # prev motion is archived
         self.browser.get(self.live_server_url + home)
         self.navigate_to_motion(mocion2_link, mocion2_text)
-        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, no_amendments)))
-        self.assertEqual(no_amendments_text, self.browser.find_element_by_xpath(no_amendments).text)
+        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, no_amendments_name)))
+        self.assertEqual(no_amendments_text, self.browser.find_element_by_name(no_amendments_name).text)
 
         # staff member amends motion
         self.amendment = Amendment(motion_amended=self.motion2)
@@ -150,9 +155,9 @@ class CgeassemblyTestCases(LiveServerTestCase):
 
         self.browser.refresh()
         # view amendment details
-        self.browser.find_element_by_xpath('/html/body/main/li/a').click()
-        self.assertEqual('Voting is not open at the moment',
-                         self.browser.find_element_by_xpath('/html/body/main/h3').text)
+        self.browser.find_element_by_xpath('/html/body/main/div/li/a').click()
+        self.assertEqual(self.browser.find_element_by_name('voting-closed').text,
+                         'Voting is not open at the moment')
 
         # staff member opens voting
         self.amendment.voteable = True
@@ -161,9 +166,9 @@ class CgeassemblyTestCases(LiveServerTestCase):
         self.browser.refresh()
 
         # vote on amendment
-        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, a_favor_radio)))
-        self.browser.find_element_by_xpath(a_favor_radio).click()
-        self.browser.find_element_by_xpath(vote_button).click()
+        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.ID, a_favor_radio_id)))
+        self.browser.find_element_by_id(a_favor_radio_id).click()
+        self.browser.find_element_by_name(vote_button_name).click()
 
         # voting has conlcuded / closed by the cge through the admin side
         self.amendment.voteable = False
@@ -179,7 +184,7 @@ class CgeassemblyTestCases(LiveServerTestCase):
         self.motion2.motion_text = amendado_text
         self.motion2.save()
         self.navigate_to_motion(mocion2_link, amendado_text)
-        self.assertEqual(amendado_text, self.browser.find_element_by_xpath('/html/body/main/h1').text)
+        self.assertEqual(amendado_text, self.browser.find_element_by_name(motion_name_desc).text)
         print('Successful amendment creation and voting!')
 
     def navigate_to_motion(self, mocion, mocion_text):
@@ -232,32 +237,32 @@ class CgeassemblyTestCases(LiveServerTestCase):
         admin.save()
 
         self.browser.refresh()
-        self.browser.find_element_by_xpath('/html/body/main/a').click()
+        self.browser.find_element_by_xpath('/html/body/main/div/a').click()
 
         # test form decline a shorter student id
         self.browser.find_element_by_xpath(student_id_form).send_keys(base.lt_student_id)
         self.browser.find_element_by_xpath(scanner_submit_btn).click()
-        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/form/p[2]').text,
+        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/div/form/p[2]').text,
                          'Ensure this value has at least 9 characters (it has 8).')
         self.browser.find_element_by_xpath(student_id_form).clear()
 
         # test form decline a longer student id
         self.browser.find_element_by_xpath(student_id_form).send_keys(base.gt_student_id)
         self.browser.find_element_by_xpath(scanner_submit_btn).click()
-        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/form/p[2]').text,
+        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/div/form/p[2]').text,
                          'Ensure this value has at most 9 characters (it has 10).')
         self.browser.find_element_by_xpath(student_id_form).clear()
 
         # test form decline a student id including a char
         self.browser.find_element_by_xpath(student_id_form).send_keys(base.char_student_id)
         self.browser.find_element_by_xpath(scanner_submit_btn).click()
-        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/form/p[2]').text, 'Only digit characters.')
+        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/div/form/p[2]').text, 'Only digit characters.')
         self.browser.find_element_by_xpath(student_id_form).clear()
 
         # test form accept existing student
         self.browser.find_element_by_xpath(student_id_form).send_keys(base.good_student_id)
         self.browser.find_element_by_xpath(scanner_submit_btn).click()
-        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/h3/span').text, 'Student has stopped attending')
+        self.assertEqual(self.browser.find_element_by_xpath('/html/body/main/div/h3/span').text, 'Student has stopped attending')
 
     def test_cgeassembly(self):
         """

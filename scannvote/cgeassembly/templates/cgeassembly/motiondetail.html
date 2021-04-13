@@ -1,8 +1,11 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
-    <h1>{{ motion }}</h1>
-    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<div class="container base">
+    <h3>Motion</h3>
+    <p name="motion-desc">{{ motion }}</p>
+
+    {% if error_message %}<p name="vote-error"><strong>{{ error_message }}</strong></p>{% endif %}
     {% if motion.voteable %}
         <form action = "{% url 'cgeassembly:vote' motion.id %}" method = "post">
         {% csrf_token %}
@@ -11,17 +14,21 @@
             <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
         {% endfor %}
         {{form.non_field_errors}}
-        <input type="submit" value="Vote">
+        <input name="vote-btn" type="submit" value="Vote">
         </form>
-    {% else %} <h3>Voting is not open at the moment</h3>
+    {% else %}
+        <p name="voting-closed">Voting is not open at the moment</p>
     {%endif%}
-    <a href= "{% url 'cgeassembly:motionresults' motion.id %}">View Results</a>
-    <h2>Amendments</h2>
+    <a style="align-content: center" href= "{% url 'cgeassembly:motionresults' motion.id %}">View Results</a>
+    <hr>
+
+    <h3>Amendments</h3>
         {% if motion.original_motion.all %}
             {% for amendment in motion.original_motion.all %}
                 <li><a href= "{% url 'cgeassembly:motiondetail' amendment.id %}">{{ amendment.motion_text }}</a></li>
             {% endfor %}
-        {% else %} <p>No amendments</p>
+        {% else %} <p name="no-amendments-msg">No amendments</p>
         {%endif%}
+</div>
 
 {% endblock %}

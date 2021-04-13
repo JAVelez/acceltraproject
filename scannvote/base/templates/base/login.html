@@ -1,8 +1,8 @@
 {% extends 'base/base.html' %}
 
-
 {% block content %}
-  <h2>Log in to My Site</h2>
+<div class="container base">
+  <h2>Login</h2>
   {% if form.errors %}
     <p style="color: red">Your username and password didn't match. Please try again.</p>
   {% endif %}
@@ -16,11 +16,9 @@
         {% for error in field.errors %}
           <p style="color: red">{{ error }}</p>
         {% endfor %}
-        {% if field.help_text %}
-          <p><small style="color: grey">{{ field.help_text }}</small></p>
-        {% endif %}
       </p>
     {% endfor %}
     <button name = "login" type="submit">Log in</button>
   </form>
+</div>
 {% endblock %}

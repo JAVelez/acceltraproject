@@ -1,6 +1,10 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
+<div class="container base">
+    <h3>Assemblies</h3>
+    <hr>
+
     {% if assemblies %}
         <ul>
         {% for assembly in assemblies %}
@@ -10,4 +14,5 @@
     {% else %}
         <p>No assemblies are available.</p>
     {% endif %}
+</div>
 {% endblock %}

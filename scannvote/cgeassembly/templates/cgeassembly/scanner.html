@@ -1,6 +1,7 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
+<div class="container base">
 <h1>This is the scanner portal for admins</h1>
   {% if success %}
     {% if attending %}
@@ -26,5 +27,6 @@
     {% endfor %}
     <button name = "scanner" type="submit">Student Scan</button>
   </form>
+</div>
 
 {% endblock %}

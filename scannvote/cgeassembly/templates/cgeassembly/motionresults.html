@@ -1,7 +1,11 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
-    <h1>{{ motion.motion_text }}</h1>
+<div class="container base">
+    <h3>Motion</h3>
+    <p>{{ motion }}</p>
+    <hr>
+
     {% if not motion.voteable or motion.archived%}
         <ul>
         {% for choice in motion.choice_set.all %}
@@ -9,6 +13,7 @@
         {% endfor %}
         </ul>
     {% else %}
-        <h3>Voting has not concluded yet.</h3>
+        <h3 name="vote-not-concluded-msg">Voting has not concluded yet.</h3>
     {%endif%}
+</div>
 {% endblock %}
