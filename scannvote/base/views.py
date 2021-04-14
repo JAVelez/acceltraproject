@@ -39,7 +39,7 @@ def signup(request):
             return HttpResponseRedirect(reverse('home'))
     else:
         form = SignUpForm()
-    return render(request, 'base/signup.html', {'form': form})
+    return render(request, 'base/signup.html', {'form': form, 'status_code': '200'})
 
 
 def login_student(request):
@@ -54,9 +54,9 @@ def login_student(request):
             login(request, user)
             return HttpResponseRedirect(reverse('home'))
         else:
-            return render(request, 'base/login_failed.html', {'form': LoginForm()})
+            return render(request, 'base/login_failed.html', {'form': LoginForm(), 'status_code': '401'})
     form = LoginForm()
-    return render(request, 'base/login.html', {'form': form})
+    return render(request, 'base/login.html', {'form': form, 'status_code': '200'})
 
 
 def logout_student(request):

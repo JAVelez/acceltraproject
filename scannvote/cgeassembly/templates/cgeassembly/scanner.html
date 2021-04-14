@@ -3,8 +3,8 @@
 {% block content %}
 <div class="container base">
 <h1>This is the scanner portal for admins</h1>
-  {% if success %}
-    {% if attending %}
+  {% if status_code == '200' %}
+    {% if code == '1' %}
       <h3> <span style = "background-color: #ff6e6e"> Student has stopped attending</span></h3>
     {% else %}
       <h3> <span style = "background-color: #6dff6d"> Student has started attending</span></h3>
