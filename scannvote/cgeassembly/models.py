@@ -119,6 +119,11 @@ class Motion(models.Model):
     archived = models.BooleanField(default=False)
     voteable = models.BooleanField(default=False)
 
+    # choices
+    a_favor = models.IntegerField(default=0, editable=False)
+    en_contra = models.IntegerField(default=0, editable=False)
+    abstenido = models.IntegerField(default=0, editable=False)
+
     def __str__(self):
         return self.motion_text
 
@@ -158,26 +163,6 @@ def vote_exists(motion, student):
         return Vote.objects.get(motion=motion, student=student)
     except:
         return None
-
-
-class Choice(models.Model):
-    """
-    model to represent choices to vote on a motion
-    :param motion: motion the choice is related to
-    :param choice text: will present 1 of 3 choices below
-    :param votes: quantity of votes the choice received
-    """
-    choices = {
-        ('a favor', 'a favor'),
-        ('en contra', 'en contra'),
-        ('abstenido', 'abstenido'),
-    }
-    motion = models.ForeignKey(Motion, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200, choices=choices)
-    votes = models.IntegerField(default=0, editable=False)
-
-    def __str__(self):
-        return self.choice_text
 
 
 class Amendment(Motion):

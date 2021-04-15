@@ -1,15 +1,10 @@
 from django.contrib import admin
 
-from .models import Assembly, Choice, Interaction, Motion, Amendment
+from .models import Assembly, Interaction, Motion, Amendment
 
 
 class AssemblyAdmin(admin.ModelAdmin):
     list_display = ['assembly_name', 'date', 'quorum']
-
-
-class ChoicesInLine(admin.TabularInline):
-    model = Choice
-    extra = 3
 
 
 class MotionAdmin(admin.ModelAdmin):
@@ -19,7 +14,6 @@ class MotionAdmin(admin.ModelAdmin):
         ('Ability to vote', {'fields': ['voteable']}),
         ('Date information', {'fields': ['date', 'archived']}),
     ]
-    inlines = [ChoicesInLine]
     # changelistview
     list_display = ['motion_text', 'date', 'assembly']
 
@@ -31,7 +25,6 @@ class AmendmentAdmin(admin.ModelAdmin):
         ('Ability to vote', {'fields': ['voteable']}),
         ('Date information', {'fields': ['date', 'archived']}),
     ]
-    inlines = [ChoicesInLine]
     # changelistview
     list_display = ['motion_text', 'date', 'assembly']
 

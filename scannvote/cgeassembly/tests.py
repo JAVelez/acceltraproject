@@ -1,7 +1,7 @@
 from django.test import LiveServerTestCase
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
-from .models import Assembly, Motion, Amendment, Choice, Interaction
+from .models import Assembly, Motion, Amendment, Interaction
 import base.tests as base
 import base.models as basemodels
 from django.contrib.auth.models import User
@@ -22,8 +22,8 @@ mocion1_text = 'Moción para acabar capstone'
 mocion1_link = '/html/body/main/div/ul[2]/li/a'
 mocion2_text = 'Moción #2 para acabar capstone pls'
 mocion2_link = '/html/body/main/div/ul[2]/li[2]/a'
-a_favor_radio_id = 'choice1'
-en_contra_radio = '/html/body/main/div/form/label[2]'
+a_favor_radio_id = 'a-favor'
+en_contra_radio_id = 'en-contra'
 vote_button_name = 'vote-btn'
 view_results_button = '/html/body/main/div/a'
 a_favor_results = '/html/body/main/div/ul/li[1]'
@@ -48,7 +48,6 @@ class CgeassemblyTestCases(StaticLiveServerTestCase):
         self.motion1 = Motion(assembly=self.assembly1, motion_text='Moción para acabar capstone',
                               date=timezone.now())
         self.motion1.save()
-        self.choices_creation(self.motion1)
 
     def anon_user_run(self):
         """
@@ -114,8 +113,8 @@ class CgeassemblyTestCases(StaticLiveServerTestCase):
 
         # try to vote twice
         self.browser.back()
-        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, en_contra_radio)))
-        self.browser.find_element_by_xpath(en_contra_radio).click()
+        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.ID, en_contra_radio_id)))
+        self.browser.find_element_by_id(en_contra_radio_id).click()
         self.browser.find_element_by_name(vote_button_name).click()
 
         # you cannot vote twice assertion
@@ -123,13 +122,14 @@ class CgeassemblyTestCases(StaticLiveServerTestCase):
                          self.browser.find_element_by_name(vote_error_name).text)
 
         # voting has conlcuded / closed by the cge through the admin side
+        self.motion1 = Motion.objects.get()  # refresh local motion object to match db motion
         self.motion1.voteable = False
         self.motion1.save()
 
         # user navigates to results
         self.browser.find_element_by_xpath(view_results_button).click()
-        self.assertEqual('a favor -- 1 vote', self.browser.find_element_by_xpath(a_favor_results).text)
-        self.assertEqual('en contra -- 0 votes', self.browser.find_element_by_xpath(en_contra_results).text)
+        self.assertEqual('A favor: 1', self.browser.find_element_by_xpath(a_favor_results).text)
+        self.assertEqual('En contra: 0', self.browser.find_element_by_xpath(en_contra_results).text)
 
         print('successful log in ->attending ->voting ->results view run')
 
@@ -138,7 +138,6 @@ class CgeassemblyTestCases(StaticLiveServerTestCase):
         self.motion2 = Motion.objects.create(assembly=self.assembly1, motion_text='Moción #2 para acabar capstone pls',
                                              date=timezone.now())
         self.motion2.save()
-        self.choices_creation(self.motion2)
 
         self.assertTrue(Motion.objects.all()[0].archived)  # prev motion is archived
         self.browser.get(self.live_server_url + home)
@@ -151,7 +150,6 @@ class CgeassemblyTestCases(StaticLiveServerTestCase):
         self.amendment.assembly = self.assembly1
         self.amendment.motion_text = 'amendando porque capstone es lo mejor del mundo'
         self.amendment.save()
-        self.choices_creation(self.amendment)
 
         self.browser.refresh()
         # view amendment details
@@ -171,13 +169,14 @@ class CgeassemblyTestCases(StaticLiveServerTestCase):
         self.browser.find_element_by_name(vote_button_name).click()
 
         # voting has conlcuded / closed by the cge through the admin side
+        self.amendment = Amendment.objects.get()  # refresh local amendment object to match db amendment
         self.amendment.voteable = False
         self.amendment.save()
 
         # user navigates to results
         self.browser.refresh()
-        self.assertEqual('a favor -- 1 vote', self.browser.find_element_by_xpath(a_favor_results).text)
-        self.assertEqual('en contra -- 0 votes', self.browser.find_element_by_xpath(en_contra_results).text)
+        self.assertEqual('A favor: 1', self.browser.find_element_by_xpath(a_favor_results).text)
+        self.assertEqual('En contra: 0', self.browser.find_element_by_xpath(en_contra_results).text)
 
         # staff member updates motion with amendment and user votes on original motion now amended
         amendado_text = self.motion2.motion_text + ' AMENDADO: ' + self.amendment.motion_text
@@ -210,16 +209,6 @@ class CgeassemblyTestCases(StaticLiveServerTestCase):
         self.motion1.voteable = True
         self.motion1.save()
         self.browser.refresh()
-
-    def choices_creation(self, motion):
-        """
-        helper method to create all 3 choices for a motion
-        :param motion: motion without choices
-        :return: n/a
-        """
-        Choice.objects.create(choice_text='a favor', motion=motion)
-        Choice.objects.create(choice_text='en contra', motion=motion)
-        Choice.objects.create(choice_text='abstenido', motion=motion)
 
     def scan_student(self):
         """

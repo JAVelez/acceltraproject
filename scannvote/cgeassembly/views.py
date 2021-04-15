@@ -5,11 +5,16 @@ from django.urls import reverse
 from django.views import generic
 
 from django.shortcuts import render
-from .models import Motion, Choice, Assembly, Vote, Interaction
+from .models import Motion, Assembly, Vote, Interaction
 import scannvote.settings as settings
 import base.models as base
 from . import models
 from .forms import EntryForm
+
+# motion choices
+A_FAVOR = '0'
+EN_CONTRA = '1'
+ABSTENIDO = '2'
 
 
 class AssemblyIndexView(generic.ListView):
@@ -71,18 +76,25 @@ def vote(request, motion_id):
         return render(request, 'cgeassembly/motiondetail.html',
                       {'motion': motion, 'error_message': "You are not attending the assembly",
                        'status_code': '200', 'code': '1'})
+
+
     try:
-        selected_choice = motion.choice_set.get(pk=request.POST['choice'])
-    except (KeyError, Choice.DoesNotExist):
-        # case where the student didn't select a choice to vote on
+        selected_choice = request.POST['choice']
+    except:
         return render(request, 'cgeassembly/motiondetail.html', {'motion': motion,
                                                                  'error_message': "You didn't select a choice.",
                                                                  'status_code': '200', 'code': '2'})
+
     else:
         # case where the student successfully votes on the motion
         if models.create_vote(motion=motion, student=student):
-            selected_choice.votes +=1
-            selected_choice.save()
+            if selected_choice is A_FAVOR:
+                motion.a_favor += 1
+            elif selected_choice is EN_CONTRA:
+                motion.en_contra += 1
+            else:
+                motion.abstenido += 1
+            motion.save()
         else:
             # case where create_vote returns None and the vote is not processed
             # because the student has already cast their vote

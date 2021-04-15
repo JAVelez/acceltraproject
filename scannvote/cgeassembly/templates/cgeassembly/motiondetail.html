@@ -9,11 +9,15 @@
     {% if motion.voteable %}
         <form action = "{% url 'cgeassembly:vote' motion.id %}" method = "post">
         {% csrf_token %}
-        {% for choice in motion.choice_set.all %}
-            <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-            <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
-        {% endfor %}
-        {{form.non_field_errors}}
+        <input type="radio" name="choice" id="a-favor" value="0">
+        <label for="a-favor">A favor</label><br>
+
+        <input type="radio" name="choice" id="en-contra" value="1">
+        <label for="en-contra">En contra</label><br>
+
+        <input type="radio" name="choice" id="abstenido" value="2">
+        <label for="abstenido">Abstenido</label><br>
+
         <input name="vote-btn" type="submit" value="Vote">
         </form>
     {% else %}
