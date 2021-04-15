@@ -54,7 +54,7 @@ def login_student(request):
             login(request, user)
             return HttpResponseRedirect(reverse('home'))
         else:
-            return render(request, 'base/login_failed.html', {'form': LoginForm(), 'status_code': '401'})
+            return render(request, 'base/login.html', {'form': LoginForm(), 'status_code': '401'})
     form = LoginForm()
     return render(request, 'base/login.html', {'form': form, 'status_code': '200'})
 
