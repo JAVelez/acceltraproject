@@ -117,13 +117,16 @@ class Motion(models.Model):
     :param motion_text: text box to present motion
     :param date: date when the motion was posted on
     :param arhcived: once a new motion is created, archived = True (representing past motions)
-    :param voteable: boolean to allow voting access to students (toggled by a staff member)
+    :param votable: boolean to allow voting access to students (toggled by a staff member)
     """
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE, limit_choices_to={'archived': False})
     motion_text = models.CharField(max_length=500)
     date = models.DateTimeField('date published', default=timezone.now)
     archived = models.BooleanField(default=False)
-    voteable = models.BooleanField(default=False)
+    votable = models.BooleanField(default=False)
+    # result_yes = models.IntegerField(default=0)
+    # result_no = models.IntegerField(default=0)
+    # result_abstain = models.IntegerField(default=0)
 
     def __str__(self):
         return self.motion_text
