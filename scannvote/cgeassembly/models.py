@@ -19,7 +19,7 @@ class Assembly(models.Model):
     assembly_name = models.CharField(max_length=200, default="")
     date = models.DateTimeField('event date')
     quorum = models.IntegerField(default=0, editable=False)
-    agenda = models.CharField(max_length=500, default="")
+    current_assembly = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
 
     def __str__(self):
@@ -118,6 +118,7 @@ class Motion(models.Model):
     date = models.DateTimeField('date published', default=timezone.now)
     archived = models.BooleanField(default=False)
     voteable = models.BooleanField(default=False)
+    is_Amendment = models.BooleanField(default=False)
 
     # choices
     a_favor = models.IntegerField(default=0, editable=False)
@@ -174,6 +175,11 @@ class Amendment(Motion):
                                        related_name='original_motion',
                                        limit_choices_to={'archived': False})
 
+    def save(self, *args, **kwargs):
+        if not self.is_Amendment:
+            self.is_Amendment = True
+        super(Amendment, self).save(*args, **kwargs)
+
 
 def get_prev_model(model):
     """
@@ -207,4 +213,11 @@ def update_model_archive(sender, instance, created, **kwargs):
 
 
 # TODO create action (admin side) to "close" assemblies where all users' attending = False & assembly.archive = True
+
+
+class AgendaPoint(models.Model):
+    assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE) #models.CharField(max_length=20, default="")
+    agenda_point = models.CharField(max_length=100, default="")
+    current_point = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
 
