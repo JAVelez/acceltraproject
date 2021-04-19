@@ -2,42 +2,121 @@ from django.db import models
 from django.contrib import admin
 
 from .models import Assembly, Interaction, Motion, Amendment, AgendaPoint
+import base.models as base
 
 
 class AssemblyAdmin(admin.ModelAdmin):
-    list_display = ['assembly_name', 'date', 'quorum']
+    """
+        admin model that allows administrator to create, edit and use assemblies
+        :param list_display: determines what parameters will be displayed in the screen
+        :param list_filter: determines what parameters will filter the display
+        :param actions: list of actions that will be available to the administrator
+    """
+    list_display = ['assembly_name', 'date', 'quorum']  # 'current_point']
+    list_filter = ['archived']
+    actions = ['make_assembly_archived', 'make_current', 'turn_off']
+
+    def make_assembly_archived(self, request, queryset):
+        """
+            method to archive selected assembly
+        """
+        queryset.update(archived=True)
+    make_assembly_archived.short_description = "Archive selected assembly(s)"
+
+    def make_current(self, request, queryset):
+        """
+            method to make assembly the current assembly
+        """
+        queryset.update(current_assembly=True)
+    make_current.short_description = "Make assembly current"
+
+    def turn_off(self, request, queryset):
+        """
+            method to terminate and archive all components of an assembly
+        """
+        queryset.update(archived=True)
+        queryset.update(current_assembly=False)
+
+        queryset1 = base.Student.objects.all()
+        queryset1.update(attending=False)
+
+        queryset2 = AgendaPoint.objects.all()
+        queryset2.update(current_point=False)
+        queryset2.update(archived=True)
+
+        queryset3 = Motion.objects.all()
+        queryset3.update(voteable=False)
+        queryset3.update(archived=True)
+
+        queryset4 = Amendment.objects.all()
+        queryset4.update(archived=True)
+    turn_off.short_description = "Turn off assembly"
 
 
 class MotionAdmin(admin.ModelAdmin):
-    # changeview
+    """
+        admin model that allows administrator to create and edit motions
+        :param fieldsets: determines the fields that needs to be filled in the creation or edit of a motion
+        :param list_display: determines what parameters will be displayed in the screen
+        :param list_filter: determines what parameters will filter the display
+        :param actions: list of actions that will be available to the administrator
+    """
     fieldsets = [
         ('Required Fields', {'fields': ['assembly', 'motion_text', ]}),
         ('Ability to vote', {'fields': ['voteable']}),
         ('Date information', {'fields': ['date', 'archived']}),
     ]
-    # changelistview
-    list_display = ['motion_text', 'assembly', 'a_favor', 'en_contra', 'abstenido']
-    list_filter = ['is_Amendment']
+
+    list_display = ['motion_text', 'is_Amendment', 'assembly', 'a_favor', 'en_contra', 'abstenido',]
+    list_filter = ['assembly', 'archived', 'is_Amendment']
+    actions = ['make_motion_archived', 'make_motion_votable']
+
+    def make_motion_archived(self, request, queryset):
+        """
+            method archive motion
+        """
+        queryset.update(archived=True)
+    make_motion_archived.short_description = "Archive selected motion(s)"
+
+    def make_motion_votable(self, request, queryset):
+        """
+            method to make motion votable
+        """
+        queryset.update(voteable=True)
+    make_motion_votable.short_description = "Allow motion to be votable"
 
 
 class AmendmentAdmin(admin.ModelAdmin):
-    # changeview
+    """
+        admin model that allows administrator to create and edit amendments
+        :param fieldsets: determines the fields that needs to be filled in the creation or edit of an amendment
+        :param list_display: determines what parameters will be displayed in the screen
+        :param list_filter: determines what parameters will filter the display
+        :param actions: list of actions that will be available to the administrator
+    """
     fieldsets = [
         ('Required Fields', {'fields': ['assembly', 'motion_amended', 'motion_text', ]}),
         ('Ability to vote', {'fields': ['voteable']}),
         ('Date information', {'fields': ['date', 'archived']}),
     ]
-    # changelistview
     list_display = ['motion_text', 'date', 'assembly']
     list_filter = ['archived']
     actions = ['make_amendment_archived', ]
 
     def make_amendment_archived(self, request, queryset):
+        """
+            method to make selected amendment an archive amendment
+        """
         queryset.update(archived=True)
     make_amendment_archived.short_description = "Archive selected amendment(s)"
 
 
 class InteractionAdmin(admin.ModelAdmin):
+    """
+        admin model that allows administrator to have access to students status toward assembly
+        :param fieldsets: determines the fields that needs to be filled in the creation or edit of an interaction
+        :param list_display: determines what parameters will be displayed in the screen
+    """
     fieldsets = [
         ('Required Fields', {'fields': ['student', 'timestamp', 'assembly']}),
     ]
@@ -46,19 +125,34 @@ class InteractionAdmin(admin.ModelAdmin):
 
 
 class AgendaAdmin(admin.ModelAdmin):
+    """
+        admin model that allows administrator to create and edit agenda points
+        :param list_display: determines what parameters will be displayed in the screen
+        :param list_filter: determines what parameters will filter the display
+        :param actions: list of actions that will be available to the administrator
+    """
     list_display = ['assembly', 'agenda_point', 'current_point']
     list_filter = ('assembly', 'archived')
     actions = ['make_false', 'make_true', 'make_agenda_point_archived', ]
 
     def make_false(self, request, queryset):
+        """
+            method to make selected agenda point not a current one
+        """
         queryset.update(current_point=False)
     make_false.short_description = 'Turn off agenda point(s)'
 
     def make_true(self, request, queryset):
+        """
+            method to make selected agenda point a current one
+        """
         queryset.update(current_point=True)
     make_true.short_description = 'Turn on agenda point(s)'
 
     def make_agenda_point_archived(self, request, queryset):
+        """
+            method to archive selected agenda point
+        """
         queryset.update(archived=True)
     make_agenda_point_archived.short_description = 'Archive selected agenda(s)'
 

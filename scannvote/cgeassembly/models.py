@@ -216,7 +216,14 @@ def update_model_archive(sender, instance, created, **kwargs):
 
 
 class AgendaPoint(models.Model):
-    assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE) #models.CharField(max_length=20, default="")
+    """
+        model that represents agenda points in the database
+        :param assembly: to which assembly is the agenda point a part of
+        :param agenda_point: text box with agenda point specification
+        :param current_point: boolean to represent when a point in agenda is the one being currently discussed
+        :param arhcived: boolean to determine if the agenda point is archived
+    """
+    assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
     agenda_point = models.CharField(max_length=100, default="")
     current_point = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
