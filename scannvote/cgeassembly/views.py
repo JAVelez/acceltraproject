@@ -127,7 +127,7 @@ def scanner(request):
                                                                     'status_code': '200', 'code': code})
             else:
                 return render(request, 'cgeassembly/scanner.html', {'form': form,
-                                                                    'status_code': '200', 'code': '1',
+                                                                    'status_code': '200', 'code': '2',
                                                                     'error_message': 'Student id is not in the database.'})
     else:
         form = EntryForm()
