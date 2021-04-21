@@ -7,7 +7,8 @@ from .models import Student
 
 # validator to parse student id
 numeric = RegexValidator(r'\d{9}', 'Only digit characters.')
-special_characters = ['!', '@', '#', '$', '%', '^', '&', '*', '-', '+', '=']
+special_characters = ['~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', ',', '.', '/', '?', '"', ':', ';',
+                      '{', '}', '|', '<', '>', '-', '+', '=']
 
 user_error_messages = {'un_lt': 'Username length must be greater than or equal to 8.',
                        'un_gt': 'Username length must be less than or equal to 16.',
