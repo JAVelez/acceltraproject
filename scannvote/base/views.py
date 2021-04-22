@@ -17,7 +17,6 @@ def home(request):
 
 def signup(request):
     """
-
     :param request: http request with form attached to it
     :return: if successful, home page showing student details; if not, signup page to try again
     """
@@ -44,7 +43,6 @@ def signup(request):
 
 def login_student(request):
     """
-
     :param request: http request with login form
     :return: if successful, home page showing student details; if not, login page to try again
     """

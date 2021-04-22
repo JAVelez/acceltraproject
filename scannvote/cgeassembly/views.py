@@ -77,7 +77,6 @@ def vote(request, motion_id):
                       {'motion': motion, 'error_message': "You are not attending the assembly",
                        'status_code': '200', 'code': '1'})
 
-
     try:
         selected_choice = request.POST['choice']
     except:

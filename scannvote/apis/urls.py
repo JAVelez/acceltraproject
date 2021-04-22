@@ -14,22 +14,26 @@ router.register(r'amendments', views.AmendmentList)
 
 urlpatterns = [
     path('', include(router.urls)),
-    # #  ex: api/signup
-    # path('signup/', views.signup, name='signup'),
-    # #  ex: api/login
-    # path('login/', views.login_student, name='login'),
-    # #  ex: api/logout
-    # path('logout/', views.logout_student, name='logout'),
+    #  ex: api/signup
+    path('signup/', views.signup),
+    #  ex: api/login
+    path('login/', views.login_student),
+    # ex: api/logout
+    path('logout/', views.logout_student),
     # # ex: /api/
     # path('', views.AssemblyIndexView.as_view(), name='assemblyindex'),
+    # # ex: /api/1
+    # path('assemblies/', views.AssemblyList),
     # ex: /api/1
-    path('<int:pk>/', views.AssemblyDetail.as_view()),
+    path('assemblies/<int:pk>/', views.AssemblyDetail.as_view()),
     # ex: /api/motions/1
     path('motions/<int:pk>/', views.MotionDetail.as_view()),
     # ex: /api/amendments/1/vote
-    path('motions/<int:pk>/vote', views.MotionDetailVote.as_view()),
+    path('motions/<int:pk>/vote', views.MotionDetailVote),
     # ex: /api/amendments/1
     path('amendments/<int:pk>/', views.AmendmentDetail.as_view()),
+    # ex: /api/amendments/1/vote
+    path('amendments/<int:pk>/vote', views.AmendmentDetailVote),
     # # ex: /api/assembly/5/results/
     # path('assembly/<int:pk>/results/', views.MotionResultsView.as_view(), name='motionresults'),
     # # ex: /api/assembly/5/vote/

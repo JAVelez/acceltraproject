@@ -1,13 +1,14 @@
 import base.models as base
 import cgeassembly.models as cge
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
+    # user = serializers.StringRelatedField()
     class Meta:
-        model = base.Student
-        fields = ['pk', 'student_id', 'attending', 'user']
+        model = User
+        fields = ['username']
 
 
 class AssemblySerializer(serializers.ModelSerializer):
