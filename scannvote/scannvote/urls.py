@@ -17,6 +17,9 @@ from django.contrib import admin
 from django.urls import path, include
 import base.views as views
 
+from django.urls import include, path
+import apis.views as apiviews
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('cgeassembly/', include('cgeassembly.urls')),
@@ -28,4 +31,5 @@ urlpatterns = [
     path(r'login/', views.login_student, name='login'),
     #  ex: /logout
     path(r'logout/', views.logout_student, name='logout'),
+    path('api/', include('apis.urls')),
 ]
