@@ -89,16 +89,19 @@ def MotionDetailVote(request, pk):
     """
     API endpoint that allows users to be viewed or edited.
     """
+    if request.user.id is None:
+        return Response(data={'error_message': "User is not logged in", 'code': '5'}, status=status.HTTP_403_METHOD_NOT_ALLOWED_OK)
+
     motion = get_object_or_404(cge.Motion, pk=pk)
     student = base.Student.get_student_by_user(request.user)
 
     # case where a staff member has not open the motion to votes or is a past motion already voted on (archived)
     if motion.archived or not motion.voteable:
-        return Response(data={'error_message': "Voting is not open at the moment", 'code': '0'}, status=status.HTTP_200_OK)
+        return Response(data={'error_message': "Voting is not open at the moment", 'code': '0'}, status=status.HTTP_405_METHOD_NOT_ALLOWED_OK)
 
     # case where a student is not attending the assembly but the motion is voteable and not archived
     if not student.attending:
-        return Response(data={'error_message': "You are not attending the assembly", 'code': '1'}, status=status.HTTP_200_OK)
+        return Response(data={'error_message': "You are not attending the assembly", 'code': '1'}, status=status.HTTP_403_FORBIDDEN)
 
     try:
         if request.data.__contains__('choice'):
@@ -106,7 +109,7 @@ def MotionDetailVote(request, pk):
         else:
             selected_choice = request.POST['choice']
     except:
-        return Response(data={'error_message': "You didn't select a choice.", 'code': '2'}, status=status.HTTP_200_OK)
+        return Response(data={'error_message': "You didn't select a choice.", 'code': '2'}, status=status.HTTP_400_BAD_REQUEST)
 
     else:
         # case where the student successfully votes on the motion
@@ -121,8 +124,8 @@ def MotionDetailVote(request, pk):
         else:
             # case where create_vote returns None and the vote is not processed
             # because the student has already cast their vote
-            return Response(data={'error_message': "You have already cast your vote.", 'code': '3'}, status=status.HTTP_200_OK)
-        return Response(data={'code': '4'}, status=status.HTTP_200_OK)
+            return Response(data={'error_message': "You have already cast your vote.", 'code': '3'}, status=status.HTTP_403_FORBIDDEN)
+        return Response(status=status.HTTP_200_OK)
 
 
 class AmendmentList(viewsets.ModelViewSet):

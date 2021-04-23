@@ -182,6 +182,8 @@ def get_prev_model(model):
     :return: None if first entry in db; previous entry in db if entries in db is more than 1
     """
     qs = model.objects.order_by('-date')
+    if model is Motion:
+        qs = model.objects.filter(amendment=None).order_by('-date')
     if len(qs) == 1:
         return None
     else:
