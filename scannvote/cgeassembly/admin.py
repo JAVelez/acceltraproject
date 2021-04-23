@@ -4,7 +4,7 @@ from .models import Assembly, Interaction, Motion, Amendment
 
 
 class AssemblyAdmin(admin.ModelAdmin):
-    list_display = ['assembly_name', 'date', 'quorum']
+    list_display = ['assembly_name', 'event_date', 'quorum']
 
 
 class MotionAdmin(admin.ModelAdmin):
@@ -12,7 +12,7 @@ class MotionAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Required Fields', {'fields': ['assembly', 'motion_text', ]}),
         ('Ability to vote', {'fields': ['voteable']}),
-        ('Date information', {'fields': ['date', 'archived']}),
+        ('Date information', {'fields': ['archived']}),
     ]
     # changelistview
     list_display = ['motion_text', 'date', 'assembly']
@@ -23,7 +23,7 @@ class AmendmentAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Required Fields', {'fields': ['assembly', 'motion_amended', 'motion_text', ]}),
         ('Ability to vote', {'fields': ['voteable']}),
-        ('Date information', {'fields': ['date', 'archived']}),
+        ('Date information', {'fields': ['archived']}),
     ]
     # changelistview
     list_display = ['motion_text', 'date', 'assembly']

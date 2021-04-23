@@ -90,14 +90,14 @@ def MotionDetailVote(request, pk):
     API endpoint that allows users to be viewed or edited.
     """
     if request.user.id is None:
-        return Response(data={'error_message': "User is not logged in", 'code': '5'}, status=status.HTTP_403_METHOD_NOT_ALLOWED_OK)
+        return Response(data={'error_message': "User is not logged in", 'code': '5'}, status=status.HTTP_403_FORBIDDEN)
 
     motion = get_object_or_404(cge.Motion, pk=pk)
     student = base.Student.get_student_by_user(request.user)
 
     # case where a staff member has not open the motion to votes or is a past motion already voted on (archived)
     if motion.archived or not motion.voteable:
-        return Response(data={'error_message': "Voting is not open at the moment", 'code': '0'}, status=status.HTTP_405_METHOD_NOT_ALLOWED_OK)
+        return Response(data={'error_message': "Voting is not open at the moment", 'code': '0'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     # case where a student is not attending the assembly but the motion is voteable and not archived
     if not student.attending:

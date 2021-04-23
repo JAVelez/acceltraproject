@@ -17,7 +17,8 @@ class Assembly(models.Model):
     :param arhcived: once it conlcudes, archived = True (representing past assemblies)
     """
     assembly_name = models.CharField(max_length=200, default="")
-    date = models.DateTimeField('event date')
+    date = models.DateTimeField('pub date', editable=False)
+    event_date = models.DateField('event date', default=timezone.now)
     quorum = models.IntegerField(default=0, editable=False)
     agenda = models.CharField(max_length=500, default="")
     archived = models.BooleanField(default=False)
@@ -115,7 +116,7 @@ class Motion(models.Model):
     """
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE, limit_choices_to={'archived': False})
     motion_text = models.CharField(max_length=500)
-    date = models.DateTimeField('date published', default=timezone.now)
+    date = models.DateTimeField('date published', default=timezone.now, editable=False)
     archived = models.BooleanField(default=False)
     voteable = models.BooleanField(default=False)
 
