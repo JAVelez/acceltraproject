@@ -163,6 +163,7 @@ def AmendmentDetailVote(request, pk):
     return MotionDetailVote(request, pk)
 
 
+# TODO return if student id is already registered and if username is already taken
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def signup(request):

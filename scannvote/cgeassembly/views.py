@@ -104,12 +104,16 @@ def vote(request, motion_id):
 
 
 # TODO only staff members can access these url's
+@login_required(login_url=settings.LOGIN_URL)
 def scanner(request):
     """
     scanner view only accessible if admin is logged in and will process their request to scan a student id card
     :param request: http request containing their student_id
     :return: if successful, redirects to scanner page, if not, returns an appropriate error message
     """
+    if request.user:
+        return render(request, 'cgeassembly/scanner.html', {'status_code': '200', 'code': '3',
+                                                            'error_message': 'The user does not have the required permissions'})
     if request.method == 'POST':
         form = EntryForm(request.POST)
         if form.is_valid():
