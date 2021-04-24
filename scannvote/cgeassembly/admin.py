@@ -14,7 +14,8 @@ class AssemblyAdmin(admin.ModelAdmin):
     """
     list_display = ['assembly_name', 'date', 'quorum']  # 'current_point']
     list_filter = ['archived']
-    actions = ['make_assembly_archived', 'make_current', 'turn_off']
+    actions = ['make_assembly_archived', 'make_assembly_unArchived', 'make_current', 'turn_off']
+    fields = ['assembly_name']
 
     def make_assembly_archived(self, request, queryset):
         """
@@ -22,6 +23,13 @@ class AssemblyAdmin(admin.ModelAdmin):
         """
         queryset.update(archived=True)
     make_assembly_archived.short_description = "Archive selected assembly(s)"
+
+    def make_assembly_unArchived(self, request, queryset):
+        """
+            method to unArchive selected assembly
+        """
+        queryset.update(archived=False)
+    make_assembly_unArchived.short_description = "Unarchive selected assembly(s)"
 
     def make_current(self, request, queryset):
         """
@@ -61,15 +69,16 @@ class MotionAdmin(admin.ModelAdmin):
         :param list_filter: determines what parameters will filter the display
         :param actions: list of actions that will be available to the administrator
     """
-    fieldsets = [
-        ('Required Fields', {'fields': ['assembly', 'motion_text', ]}),
-        ('Ability to vote', {'fields': ['voteable']}),
-        ('Date information', {'fields': ['date', 'archived']}),
-    ]
+#    fieldsets = [
+#        ('Required Fields', {'fields': ['assembly', 'motion_text', ]}),
+#        ('Ability to vote', {'fields': ['voteable']}),
+#        ('Date information', {'fields': ['date', 'archived']}),
+#    ]
 
     list_display = ['motion_text', 'is_Amendment', 'assembly', 'a_favor', 'en_contra', 'abstenido',]
     list_filter = ['assembly', 'archived', 'is_Amendment']
-    actions = ['make_motion_archived', 'make_motion_votable']
+    actions = ['make_motion_archived', 'make_motion_votable', 'make_motion_unArchived', 'make_motion_unVotable']
+    fields = ['assembly', 'motion_text']
 
     def make_motion_archived(self, request, queryset):
         """
@@ -78,12 +87,27 @@ class MotionAdmin(admin.ModelAdmin):
         queryset.update(archived=True)
     make_motion_archived.short_description = "Archive selected motion(s)"
 
+    def make_motion_unArchived(self, request, queryset):
+        """
+            method to unArchive motion
+        """
+        queryset.update(archived=False)
+
+    make_motion_unArchived.short_description = "Unarchive selected motion(s)"
+
     def make_motion_votable(self, request, queryset):
         """
             method to make motion votable
         """
         queryset.update(voteable=True)
     make_motion_votable.short_description = "Allow motion to be votable"
+
+    def make_motion_unVotable(self, request, queryset):
+        """
+            method to make motion not votable
+        """
+        queryset.update(voteable=True)
+    make_motion_unVotable.short_description = "Unallow motion to be votable"
 
 
 class AmendmentAdmin(admin.ModelAdmin):
@@ -94,14 +118,15 @@ class AmendmentAdmin(admin.ModelAdmin):
         :param list_filter: determines what parameters will filter the display
         :param actions: list of actions that will be available to the administrator
     """
-    fieldsets = [
-        ('Required Fields', {'fields': ['assembly', 'motion_amended', 'motion_text', ]}),
-        ('Ability to vote', {'fields': ['voteable']}),
-        ('Date information', {'fields': ['date', 'archived']}),
-    ]
+#    fieldsets = [
+#        ('Required Fields', {'fields': ['assembly', 'motion_amended', 'motion_text', ]}),
+#        ('Ability to vote', {'fields': ['voteable']}),
+#        ('Date information', {'fields': ['date', 'archived']}),
+#    ]
     list_display = ['motion_text', 'date', 'assembly']
     list_filter = ['archived']
-    actions = ['make_amendment_archived', ]
+    actions = ['make_amendment_archived', 'make_amendment_unArchived']
+    fields = ['assembly', 'motion_text']
 
     def make_amendment_archived(self, request, queryset):
         """
@@ -110,6 +135,14 @@ class AmendmentAdmin(admin.ModelAdmin):
         queryset.update(archived=True)
     make_amendment_archived.short_description = "Archive selected amendment(s)"
 
+    def make_amendment_unArchived(self, request, queryset):
+        """
+            method to make selected amendment unarchived
+        """
+        queryset.update(archived=False)
+
+    make_amendment_unArchived.short_description = "Unarchive selected motion(s)"
+
 
 class InteractionAdmin(admin.ModelAdmin):
     """
@@ -117,9 +150,9 @@ class InteractionAdmin(admin.ModelAdmin):
         :param fieldsets: determines the fields that needs to be filled in the creation or edit of an interaction
         :param list_display: determines what parameters will be displayed in the screen
     """
-    fieldsets = [
-        ('Required Fields', {'fields': ['student', 'timestamp', 'assembly']}),
-    ]
+#    fieldsets = [
+#        ('Required Fields', {'fields': ['student', 'timestamp', 'assembly']}),
+#    ]
 
     list_display = ['student', 'timestamp', 'assembly']
 
@@ -133,7 +166,8 @@ class AgendaAdmin(admin.ModelAdmin):
     """
     list_display = ['assembly', 'agenda_point', 'current_point']
     list_filter = ('assembly', 'archived')
-    actions = ['make_false', 'make_true', 'make_agenda_point_archived', ]
+    actions = ['make_false', 'make_true', 'make_agenda_point_archived', 'make_agenda_point_unArchived']
+    fields = ['assembly', 'agenda_point']
 
     def make_false(self, request, queryset):
         """
@@ -154,7 +188,15 @@ class AgendaAdmin(admin.ModelAdmin):
             method to archive selected agenda point
         """
         queryset.update(archived=True)
-    make_agenda_point_archived.short_description = 'Archive selected agenda(s)'
+    make_agenda_point_archived.short_description = 'Archive selected agenda point(s)'
+
+    def make_agenda_point_unArchived(self, request, queryset):
+        """
+            method to unArchive selected agenda point
+        """
+        queryset.update(archived=False)
+
+    make_agenda_point_unArchived.short_description = "Unarchive selected agenda point(s)"
 
 
 admin.site.register(Assembly, AssemblyAdmin)

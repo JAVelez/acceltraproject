@@ -224,7 +224,7 @@ class AgendaPoint(models.Model):
         :param arhcived: boolean to determine if the agenda point is archived
     """
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
-    agenda_point = models.CharField(max_length=100, default="")
+    agenda_point = models.TextField(max_length=100, default="")
     current_point = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
 
