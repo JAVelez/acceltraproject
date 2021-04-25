@@ -115,10 +115,11 @@ class Motion(models.Model):
     :param voteable: boolean to allow voting access to students (toggled by a staff member)
     """
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE, limit_choices_to={'archived': False})
-    motion_text = models.CharField(max_length=500)
+    motion_text = models.TextField('Content to display', max_length=1000)
     date = models.DateTimeField('date published', default=timezone.now, editable=False)
     archived = models.BooleanField(default=False)
     voteable = models.BooleanField(default=False)
+    is_Amendment = models.BooleanField(default=False)
 
     # choices
     a_favor = models.IntegerField(default=0, editable=False)
@@ -171,9 +172,14 @@ class Amendment(Motion):
     model that inhjerits from Motion due to being a special type of motion
     :param motion_amended: relation to which motion it is amending
     """
-    motion_amended = models.ForeignKey(Motion, on_delete=models.CASCADE,
+    motion_amended = models.ForeignKey(Motion, on_delete=models.CASCADE, verbose_name='Motion to be amended',
                                        related_name='original_motion',
                                        limit_choices_to={'archived': False})
+
+    def save(self, *args, **kwargs):
+        if not self.is_Amendment:
+            self.is_Amendment = True
+        super(Amendment, self).save(*args, **kwargs)
 
 
 def get_prev_model(model):
@@ -210,4 +216,3 @@ def update_model_archive(sender, instance, created, **kwargs):
 
 
 # TODO create action (admin side) to "close" assemblies where all users' attending = False & assembly.archive = True
-

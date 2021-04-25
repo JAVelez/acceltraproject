@@ -1,43 +1,158 @@
+from django.db import models
 from django.contrib import admin
 
 from .models import Assembly, Interaction, Motion, Amendment
+import base.models as base
 
 
 class AssemblyAdmin(admin.ModelAdmin):
+    """
+        admin model that allows administrator to create, edit and use assemblies
+        :param list_display: determines what parameters will be displayed in the screen
+        :param list_filter: determines what parameters will filter the display
+        :param actions: list of actions that will be available to the administrator
+    """
     list_display = ['assembly_name', 'event_date', 'quorum']
+    list_filter = ['archived']
+    actions = ['make_assembly_archived', 'make_assembly_unArchived', 'make_current', 'turn_off']
+    fields = ['assembly_name', 'event_date']
+
+    def make_assembly_archived(self, request, queryset):
+        """
+            method to archive selected assembly
+        """
+        queryset.update(archived=True)
+    make_assembly_archived.short_description = "Archive selected assembly(s)"
+
+    def make_assembly_unArchived(self, request, queryset):
+        """
+            method to unArchive selected assembly
+        """
+        queryset.update(archived=False)
+    make_assembly_unArchived.short_description = "Unarchive selected assembly(s)"
+
+    # def make_current(self, request, queryset):
+    #     """
+    #         method to make assembly the current assembly
+    #     """
+    #     queryset.update(current_assembly=True)
+    # make_current.short_description = "Make assembly current"
+
+    def turn_off(self, request, queryset):
+        """
+            method to terminate and archive all components of an assembly
+        """
+        queryset.update(archived=True)
+        # queryset.update(current_assembly=False)
+
+        queryset1 = base.Student.objects.all()
+        queryset1.update(attending=False)
+
+        # queryset2 = AgendaPoint.objects.all()
+        # queryset2.update(current_point=False)
+        # queryset2.update(archived=True)
+
+        queryset3 = Motion.objects.all()
+        queryset3.update(voteable=False)
+        queryset3.update(archived=True)
+
+        queryset4 = Amendment.objects.all()
+        queryset4.update(archived=True)
+    turn_off.short_description = "Conclude assembly"
 
 
 class MotionAdmin(admin.ModelAdmin):
-    # changeview
+    """
+         admin model that allows administrator to create and edit motions
+         :param fieldsets: determines the fields that needs to be filled in the creation or edit of a motion
+         :param list_display: determines what parameters will be displayed in the screen
+         :param list_filter: determines what parameters will filter the display
+         :param actions: list of actions that will be available to the administrator
+     """
     fieldsets = [
         ('Required Fields', {'fields': ['assembly', 'motion_text', ]}),
-        ('Ability to vote', {'fields': ['voteable']}),
-        ('Date information', {'fields': ['archived']}),
     ]
     # changelistview
-    list_display = ['motion_text', 'date', 'assembly']
+    list_display = ['motion_text', 'is_Amendment', 'assembly', 'a_favor', 'en_contra', 'abstenido',]
+    list_filter = ['assembly', 'archived', 'is_Amendment']
+    actions = ['make_motion_archived', 'make_motion_votable', 'make_motion_unArchived', 'make_motion_unVotable']
+
+    def make_motion_archived(self, request, queryset):
+        """
+            method archive motion
+        """
+        queryset.update(archived=True)
+    make_motion_archived.short_description = "Archive selected motion(s)"
+
+    def make_motion_unArchived(self, request, queryset):
+        """
+            method to unArchive motion
+        """
+        queryset.update(archived=False)
+
+    make_motion_unArchived.short_description = "Unarchive selected motion(s)"
+
+    def make_motion_votable(self, request, queryset):
+        """
+            method to make motion votable
+        """
+        queryset.update(voteable=True)
+    make_motion_votable.short_description = "Allow motion to be votable"
+
+    def make_motion_unVotable(self, request, queryset):
+        """
+            method to make motion not votable
+        """
+        queryset.update(voteable=True)
+    make_motion_unVotable.short_description = "Unallow motion to be votable"
 
 
 class AmendmentAdmin(admin.ModelAdmin):
-    # changeview
+    """
+        admin model that allows administrator to create and edit amendments
+        :param fieldsets: determines the fields that needs to be filled in the creation or edit of an amendment
+        :param list_display: determines what parameters will be displayed in the screen
+        :param list_filter: determines what parameters will filter the display
+        :param actions: list of actions that will be available to the administrator
+    """
     fieldsets = [
         ('Required Fields', {'fields': ['assembly', 'motion_amended', 'motion_text', ]}),
-        ('Ability to vote', {'fields': ['voteable']}),
-        ('Date information', {'fields': ['archived']}),
     ]
     # changelistview
     list_display = ['motion_text', 'date', 'assembly']
+    list_filter = ['archived']
+    actions = ['make_amendment_archived', 'make_amendment_unArchived']
+
+    def make_amendment_archived(self, request, queryset):
+        """
+            method to make selected amendment an archive amendment
+        """
+        queryset.update(archived=True)
+    make_amendment_archived.short_description = "Archive selected amendment(s)"
+
+    def make_amendment_unArchived(self, request, queryset):
+        """
+            method to make selected amendment unarchived
+        """
+        queryset.update(archived=False)
+
+    make_amendment_unArchived.short_description = "Unarchive selected motion(s)"
 
 
-class InteractionAdmin(admin.ModelAdmin):
-    fieldsets = [
-        ('Required Fields', {'fields': ['student', 'timestamp', 'assembly']}),
-    ]
-
-    list_display = ['student', 'timestamp', 'assembly']
+# class InteractionAdmin(admin.ModelAdmin):
+#     """
+#         admin model that allows administrator to have access to students status toward assembly
+#         :param fieldsets: determines the fields that needs to be filled in the creation or edit of an interaction
+#         :param list_display: determines what parameters will be displayed in the screen
+#     """
+#     fieldsets = [
+#         ('Required Fields', {'fields': ['student', 'timestamp', 'assembly']}),
+#     ]
+#
+#     list_display = ['student', 'timestamp', 'assembly']
 
 
 admin.site.register(Assembly, AssemblyAdmin)
 admin.site.register(Motion, MotionAdmin)
 admin.site.register(Amendment, AmendmentAdmin)
-admin.site.register(Interaction, InteractionAdmin)
+# admin.site.register(Interaction, InteractionAdmin)

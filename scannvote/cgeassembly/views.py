@@ -111,9 +111,9 @@ def scanner(request):
     :param request: http request containing their student_id
     :return: if successful, redirects to scanner page, if not, returns an appropriate error message
     """
-    if request.user:
-        return render(request, 'cgeassembly/scanner.html', {'status_code': '200', 'code': '3',
-                                                            'error_message': 'The user does not have the required permissions'})
+    # if request.user:
+    #     return render(request, 'cgeassembly/scanner.html', {'status_code': '200', 'code': '3',
+    #                                                         'error_message': 'The user does not have the required permissions'})
     if request.method == 'POST':
         form = EntryForm(request.POST)
         if form.is_valid():
