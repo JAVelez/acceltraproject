@@ -188,7 +188,10 @@ def signup(request):
             login(request, user)
             return Response(data={'user': user.username}, status=status.HTTP_200_OK)
         else:
-            return Response(data={'error_msg': 'error with a parameter'}, status=status.HTTP_409_CONFLICT)
+            error_dict = {}
+            for e in form.errors:
+                error_dict[e] = form.errors[e].data[0].message
+            return Response(data=error_dict, status=status.HTTP_409_CONFLICT)
 
 
 @api_view(['POST'])
