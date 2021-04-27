@@ -1,1 +1,1 @@
-web: gunicorn wsgi --log-file -
+web: gunicorn scannvote.scannvote.wsgi --log-file -
