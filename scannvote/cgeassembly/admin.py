@@ -159,7 +159,7 @@ class AmendmentAdmin(admin.ModelAdmin):
         #('Date information', {'fields': ['date', 'archived']}),
     ]
     list_display = ['motion_text', 'date', 'assembly']
-    list_filter = ['archived']
+    list_filter = ['motion_amended', 'archived']
     actions = ['make_amendment_archived', 'make_amendment_unArchived']
     #fields = ['assembly', 'moton_amended', 'motion_text']
 
