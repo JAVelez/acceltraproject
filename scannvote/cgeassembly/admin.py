@@ -1,3 +1,5 @@
+from django.contrib.admin.models import LogEntry, ADDITION
+from django.contrib.admin.options import get_content_type_for_model
 from django.db import models
 from django.contrib import admin
 
@@ -16,6 +18,15 @@ class AssemblyAdmin(admin.ModelAdmin):
     list_filter = ['archived']
     actions = ['make_assembly_archived', 'make_assembly_unArchived', 'make_current', 'turn_off']
     fields = ['assembly_name']
+
+    def log_addition(self, *args):
+        return
+
+    def log_change(self, *args):
+        return
+
+    def log_deletion(self, *args):
+        return
 
     def make_assembly_archived(self, request, queryset):
         """
@@ -74,11 +85,35 @@ class MotionAdmin(admin.ModelAdmin):
 #        ('Ability to vote', {'fields': ['voteable']}),
 #        ('Date information', {'fields': ['date', 'archived']}),
 #    ]
-
+    fields = ['assembly', 'motion_text']
     list_display = ['motion_text', 'is_Amendment', 'assembly', 'a_favor', 'en_contra', 'abstenido',]
     list_filter = ['assembly', 'archived', 'is_Amendment']
     actions = ['make_motion_archived', 'make_motion_votable', 'make_motion_unArchived', 'make_motion_unVotable']
-    fields = ['assembly', 'motion_text']
+
+    def formfield_for_dbfield(self, *args, **kwargs):
+        formfield = super().formfield_for_dbfield(*args, **kwargs)
+
+        formfield.widget.can_add_related = False
+        formfield.widget.can_delete_related = False
+        formfield.widget.can_change_related = False
+
+        return formfield
+
+    def log_addition(self, request, object, message):
+        messages = "Created motion: %s; for assembly: %s" % (str(object), str(object.assembly))
+        return LogEntry.objects.log_action(
+            user_id=request.user.pk,
+            content_type_id=get_content_type_for_model(object).pk,
+            object_id=object.pk,
+            object_repr=messages,
+            action_flag=ADDITION,
+            change_message=message)
+
+    def log_change(self, *args):
+        return
+
+    def log_deletion(self, *args):
+        return
 
     def make_motion_archived(self, request, queryset):
         """
@@ -118,15 +153,47 @@ class AmendmentAdmin(admin.ModelAdmin):
         :param list_filter: determines what parameters will filter the display
         :param actions: list of actions that will be available to the administrator
     """
-#    fieldsets = [
-#        ('Required Fields', {'fields': ['assembly', 'motion_amended', 'motion_text', ]}),
-#        ('Ability to vote', {'fields': ['voteable']}),
-#        ('Date information', {'fields': ['date', 'archived']}),
-#    ]
+    fieldsets = [
+        ('Required Fields', {'fields': ['assembly', 'motion_amended', 'motion_text', ]}),
+        #('Ability to vote', {'fields': ['voteable']}),
+        #('Date information', {'fields': ['date', 'archived']}),
+    ]
     list_display = ['motion_text', 'date', 'assembly']
     list_filter = ['archived']
     actions = ['make_amendment_archived', 'make_amendment_unArchived']
-    fields = ['assembly', 'motion_text']
+    #fields = ['assembly', 'moton_amended', 'motion_text']
+
+    def formfield_for_dbfield(self, *args, **kwargs):
+        formfield = super().formfield_for_dbfield(*args, **kwargs)
+
+        formfield.widget.can_add_related = False
+        formfield.widget.can_delete_related = False
+        formfield.widget.can_change_related = False
+
+        return formfield
+
+    def log_addition(self, request, object, message):
+        messages = "Amended motion: %s; with: %s" % (str(object.motion_amended), str(object))
+        return LogEntry.objects.log_action(
+            user_id=request.user.pk,
+            content_type_id=get_content_type_for_model(object).pk,
+            object_id=object.pk,
+            object_repr= messages, #(str(object),
+            action_flag=ADDITION,
+            change_message=message)
+
+    def log_change(self, *args):
+        return
+
+    def log_deletion(self, *args):
+        return
+
+    # def choices(self, changelist):
+    #     yield {
+    #         'selected': self.lookup_val is None and self.lookup_val_isnull is None,
+    #         'query_string': changelist.get_query_string(remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]),
+    #         # 'display': _('All'),
+    #     }
 
     def make_amendment_archived(self, request, queryset):
         """
@@ -168,6 +235,9 @@ class AgendaAdmin(admin.ModelAdmin):
     list_filter = ('assembly', 'archived')
     actions = ['make_false', 'make_true', 'make_agenda_point_archived', 'make_agenda_point_unArchived']
     fields = ['assembly', 'agenda_point']
+
+    def log_addition(self, *args):
+        return
 
     def make_false(self, request, queryset):
         """
