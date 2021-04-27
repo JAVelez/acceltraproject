@@ -6,7 +6,6 @@ from . import views
 app_name = 'api'
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
 router.register(r'assemblies', views.AssemblyList)
 router.register(r'motions', views.MotionList)
 router.register(r'amendments', views.AmendmentList)

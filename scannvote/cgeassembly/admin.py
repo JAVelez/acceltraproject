@@ -15,7 +15,7 @@ class AssemblyAdmin(admin.ModelAdmin):
     list_display = ['assembly_name', 'event_date', 'quorum']
     list_filter = ['archived']
     actions = ['make_assembly_archived', 'make_assembly_unArchived', 'make_current', 'turn_off']
-    fields = ['assembly_name', 'event_date']
+    fields = ['assembly_name', 'event_date', 'agenda']
 
     def make_assembly_archived(self, request, queryset):
         """

@@ -20,7 +20,7 @@ class Assembly(models.Model):
     date = models.DateTimeField('pub date', editable=False)
     event_date = models.DateField('event date', default=timezone.now)
     quorum = models.IntegerField(default=0, editable=False)
-    agenda = models.CharField(max_length=500, default="")
+    agenda = models.TextField(max_length=1000, default="N/A")
     archived = models.BooleanField(default=False)
 
     def __str__(self):

@@ -25,7 +25,7 @@ SECRET_KEY = '4)9^@ad3@v5l^0$*dl$emrg9t$k+__01ucynu6x73$h%c4-9#p'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['scannvote.herokuapp.com', '127.0.0.1']
 
 
 # Application definition
@@ -74,20 +74,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'scannvote.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'cge',
-        'USER': 'postgres',
-        'PASSWORD': 'Supw123#',
-        'HOST': 'localhost',
-        'PORT': '5433'
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'cge',
+            'USER': 'postgres',
+            'PASSWORD': 'Supw123#',
+            'HOST': 'localhost',
+            'PORT': '5433'
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'de093r23nfi4jj',
+            'USER': 'akzsnbbzrpypli',
+            'PASSWORD': '16d5998a6f295f2bc4717995e09027886eb0e9c012921bb31a67fa02bbaa01cb',
+            'HOST': 'ec2-107-22-83-3.compute-1.amazonaws.com',
+            'PORT': 5432
+        }
+    }
 
 
 # Password validation
