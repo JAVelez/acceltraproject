@@ -1,1 +1,0 @@
-web: gunicorn scannvote.scannvote.wsgi --log-file -
