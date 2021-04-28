@@ -19,10 +19,6 @@ urlpatterns = [
     path('login/', views.login_student),
     # ex: api/logout
     path('logout/', views.logout_student),
-    # # ex: /api/
-    # path('', views.AssemblyIndexView.as_view(), name='assemblyindex'),
-    # # ex: /api/1
-    # path('assemblies/', views.AssemblyList),
     # ex: /api/1
     path('assemblies/<int:pk>/', views.AssemblyDetail.as_view()),
     # ex: /api/motions/1
@@ -33,9 +29,5 @@ urlpatterns = [
     path('amendments/<int:pk>/', views.AmendmentDetail.as_view()),
     # ex: /api/amendments/1/vote
     path('amendments/<int:pk>/vote', views.AmendmentDetailVote),
-    # # ex: /api/assembly/5/results/
-    # path('assembly/<int:pk>/results/', views.MotionResultsView.as_view(), name='motionresults'),
-    # # ex: /api/assembly/5/vote/
-    # path('assembly/<int:motion_id>/vote/', views.vote, name='vote'),
 
 ]

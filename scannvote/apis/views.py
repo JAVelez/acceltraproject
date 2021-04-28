@@ -11,8 +11,6 @@ from django.db.models.query import QuerySet
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from django.http import QueryDict
-from .serializers import AssemblySerializer
 
 from django.contrib.auth.models import User
 
@@ -35,14 +33,6 @@ class AssemblyList(viewsets.ModelViewSet):
     """
     queryset = cge.Assembly.objects.all().order_by('-date')
     serializer_class = serializer.AssemblySerializer
-
-# @api_view(['GET'])
-# @permission_classes((permissions.AllowAny,))
-# def AssemblyList(request):
-#     if request.method == 'GET':
-#         assemblies = cge.Assembly.objects.all().order_by('-date')
-#         serializer = AssemblySerializer(assemblies, many=True)
-#         return Response(serializer.data)
 
 
 class AssemblyDetail(generics.RetrieveUpdateDestroyAPIView):

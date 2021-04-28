@@ -17,7 +17,7 @@ class Assembly(models.Model):
     :param arhcived: once it conlcudes, archived = True (representing past assemblies)
     """
     assembly_name = models.CharField(max_length=200, default="")
-    date = models.DateTimeField('pub date', editable=False)
+    date = models.DateTimeField('pub date', editable=False, default=timezone.now)
     event_date = models.DateField('event date', default=timezone.now)
     quorum = models.IntegerField(default=0, editable=False)
     agenda = models.TextField(max_length=1000, default="N/A")
@@ -198,6 +198,7 @@ def get_prev_model(model):
 
 
 @receiver(post_save, sender=Motion)
+@receiver(post_save, sender=Amendment)
 @receiver(post_save, sender=Assembly)
 def update_model_archive(sender, instance, created, **kwargs):
     """
@@ -213,6 +214,3 @@ def update_model_archive(sender, instance, created, **kwargs):
         if model_to_archive:
             model_to_archive.archived = True
             model_to_archive.save()
-
-
-# TODO create action (admin side) to "close" assemblies where all users' attending = False & assembly.archive = True
