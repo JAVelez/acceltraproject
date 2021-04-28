@@ -20,12 +20,21 @@ class AssemblyAdmin(admin.ModelAdmin):
     fields = ['assembly_name']
 
     def log_addition(self, *args):
+        """
+            method to remove adding action to recent actions display
+        """
         return
 
     def log_change(self, *args):
+        """
+            method eliminate change actions from recent actions display
+        """
         return
 
     def log_deletion(self, *args):
+        """
+            method eliminate delete actions from recent actions display
+        """
         return
 
     def make_assembly_archived(self, request, queryset):
@@ -91,6 +100,9 @@ class MotionAdmin(admin.ModelAdmin):
     actions = ['make_motion_archived', 'make_motion_votable', 'make_motion_unArchived', 'make_motion_unVotable']
 
     def formfield_for_dbfield(self, *args, **kwargs):
+        """
+            removes widgets add, change and delete from foreign keys during creation of class object
+        """
         formfield = super().formfield_for_dbfield(*args, **kwargs)
 
         formfield.widget.can_add_related = False
@@ -100,6 +112,9 @@ class MotionAdmin(admin.ModelAdmin):
         return formfield
 
     def log_addition(self, request, object, message):
+        """
+            method to add adding action to recent actions display
+        """
         messages = "Created motion: %s; for assembly: %s" % (str(object), str(object.assembly))
         return LogEntry.objects.log_action(
             user_id=request.user.pk,
@@ -110,9 +125,15 @@ class MotionAdmin(admin.ModelAdmin):
             change_message=message)
 
     def log_change(self, *args):
+        """
+            method eliminate change actions from recent actions display
+        """
         return
 
     def log_deletion(self, *args):
+        """
+            method eliminate delete actions from recent actions display
+        """
         return
 
     def make_motion_archived(self, request, queryset):
@@ -155,15 +176,15 @@ class AmendmentAdmin(admin.ModelAdmin):
     """
     fieldsets = [
         ('Required Fields', {'fields': ['assembly', 'motion_amended', 'motion_text', ]}),
-        #('Ability to vote', {'fields': ['voteable']}),
-        #('Date information', {'fields': ['date', 'archived']}),
     ]
     list_display = ['motion_text', 'date', 'assembly']
     list_filter = ['motion_amended', 'archived']
     actions = ['make_amendment_archived', 'make_amendment_unArchived']
-    #fields = ['assembly', 'moton_amended', 'motion_text']
 
     def formfield_for_dbfield(self, *args, **kwargs):
+        """
+            removes widgets add, change and delete from foreign keys during creation of class object
+        """
         formfield = super().formfield_for_dbfield(*args, **kwargs)
 
         formfield.widget.can_add_related = False
@@ -173,6 +194,9 @@ class AmendmentAdmin(admin.ModelAdmin):
         return formfield
 
     def log_addition(self, request, object, message):
+        """
+            method to add adding action to recent actions display
+        """
         messages = "Amended motion: %s; with: %s" % (str(object.motion_amended), str(object))
         return LogEntry.objects.log_action(
             user_id=request.user.pk,
@@ -183,17 +207,16 @@ class AmendmentAdmin(admin.ModelAdmin):
             change_message=message)
 
     def log_change(self, *args):
+        """
+            method eliminate change actions from recent actions display
+        """
         return
 
     def log_deletion(self, *args):
+        """
+            method eliminate delete actions from recent actions display
+        """
         return
-
-    # def choices(self, changelist):
-    #     yield {
-    #         'selected': self.lookup_val is None and self.lookup_val_isnull is None,
-    #         'query_string': changelist.get_query_string(remove=[self.lookup_kwarg, self.lookup_kwarg_isnull]),
-    #         # 'display': _('All'),
-    #     }
 
     def make_amendment_archived(self, request, queryset):
         """
