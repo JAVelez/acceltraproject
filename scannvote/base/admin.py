@@ -10,10 +10,32 @@ class StudentAdmin(admin.ModelAdmin):
         :param list_display: determines what parameters will be displayed in the screen
         :param list_filter: determines what parameters will filter the display
         :param actions: list of actions that will be available to the administrator
+        :param fieldsets: Fields to be displayed when editing or creating a student
     """
     list_display = ('student_id', 'user', 'faculty', 'attending')
     list_filter = ('attending',)
     actions = ['make_false', ]
+    fieldsets = [
+        ('Required Fields', {'fields': ['student_id', 'user', 'faculty', ]}),
+    ]
+
+    def log_addition(self, *args):
+        """
+            method to remove adding action to recent actions display
+        """
+        return
+
+    def log_change(self, *args):
+        """
+            method eliminate change actions from recent actions display
+        """
+        return
+
+    def log_deletion(self, *args):
+        """
+            method eliminate delete actions from recent actions display
+        """
+        return
 
     def make_false(self, request, queryset):
         """

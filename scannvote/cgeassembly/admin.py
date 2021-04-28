@@ -1,3 +1,5 @@
+from django.contrib.admin.models import LogEntry, ADDITION
+from django.contrib.admin.options import get_content_type_for_model
 from django.db import models
 from django.contrib import admin
 
@@ -16,6 +18,24 @@ class AssemblyAdmin(admin.ModelAdmin):
     list_filter = ['archived']
     actions = ['make_assembly_archived', 'make_assembly_unArchived', 'make_current', 'turn_off']
     fields = ['assembly_name', 'event_date', 'agenda']
+
+    def log_addition(self, *args):
+        """
+            method to remove adding action to recent actions display
+        """
+        return
+
+    def log_change(self, *args):
+        """
+            method eliminate change actions from recent actions display
+        """
+        return
+
+    def log_deletion(self, *args):
+        """
+            method eliminate delete actions from recent actions display
+        """
+        return
 
     def make_assembly_archived(self, request, queryset):
         """
@@ -77,6 +97,43 @@ class MotionAdmin(admin.ModelAdmin):
     list_filter = ['assembly', 'archived', 'is_Amendment']
     actions = ['make_motion_archived', 'make_motion_votable', 'make_motion_unArchived', 'make_motion_unVotable']
 
+    def formfield_for_dbfield(self, *args, **kwargs):
+        """
+            removes widgets add, change and delete from foreign keys during creation of class object
+        """
+        formfield = super().formfield_for_dbfield(*args, **kwargs)
+
+        formfield.widget.can_add_related = False
+        formfield.widget.can_delete_related = False
+        formfield.widget.can_change_related = False
+
+        return formfield
+
+    def log_addition(self, request, object, message):
+        """
+            method to add adding action to recent actions display
+        """
+        messages = "Created motion: %s; for assembly: %s" % (str(object), str(object.assembly))
+        return LogEntry.objects.log_action(
+            user_id=request.user.pk,
+            content_type_id=get_content_type_for_model(object).pk,
+            object_id=object.pk,
+            object_repr=messages,
+            action_flag=ADDITION,
+            change_message=message)
+
+    def log_change(self, *args):
+        """
+            method eliminate change actions from recent actions display
+        """
+        return
+
+    def log_deletion(self, *args):
+        """
+            method eliminate delete actions from recent actions display
+        """
+        return
+
     def make_motion_archived(self, request, queryset):
         """
             method archive motion
@@ -120,8 +177,45 @@ class AmendmentAdmin(admin.ModelAdmin):
     ]
     # changelistview
     list_display = ['motion_text', 'date', 'assembly']
-    list_filter = ['archived']
+    list_filter = ['motion_amended', 'archived']
     actions = ['make_amendment_archived', 'make_amendment_unArchived']
+
+    def formfield_for_dbfield(self, *args, **kwargs):
+        """
+            removes widgets add, change and delete from foreign keys during creation of class object
+        """
+        formfield = super().formfield_for_dbfield(*args, **kwargs)
+
+        formfield.widget.can_add_related = False
+        formfield.widget.can_delete_related = False
+        formfield.widget.can_change_related = False
+
+        return formfield
+
+    def log_addition(self, request, object, message):
+        """
+            method to add adding action to recent actions display
+        """
+        messages = "Amended motion: %s; with: %s" % (str(object.motion_amended), str(object))
+        return LogEntry.objects.log_action(
+            user_id=request.user.pk,
+            content_type_id=get_content_type_for_model(object).pk,
+            object_id=object.pk,
+            object_repr= messages, #(str(object),
+            action_flag=ADDITION,
+            change_message=message)
+
+    def log_change(self, *args):
+        """
+            method eliminate change actions from recent actions display
+        """
+        return
+
+    def log_deletion(self, *args):
+        """
+            method eliminate delete actions from recent actions display
+        """
+        return
 
     def make_amendment_archived(self, request, queryset):
         """

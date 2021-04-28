@@ -17,8 +17,9 @@ from django.contrib import admin
 from django.urls import path, include
 import base.views as views
 
-from django.urls import include, path
-import apis.views as apiviews
+admin.site.site_header = "Scan-N-Vote"
+admin.site.site_title = "Scan-N-Vote"
+admin.site.index_title = "Administrative Side"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
