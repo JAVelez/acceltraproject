@@ -213,3 +213,9 @@ def logout_student(request):
     """
     logout(request)
     return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def token(request):
+    return Response(data={'token': request.COOKIES['csrftoken']}, status=status.HTTP_200_OK)

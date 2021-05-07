@@ -14,6 +14,8 @@ router.register(r'amendments', views.AmendmentList)
 urlpatterns = [
     path('', include(router.urls)),
     #  ex: api/signup
+    path('token/', views.token),
+    #  ex: api/signup
     path('signup/', views.signup),
     #  ex: api/login
     path('login/', views.login_student),
