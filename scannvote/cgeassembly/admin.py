@@ -177,6 +177,43 @@ class AmendmentAdmin(admin.ModelAdmin):
     actions = ['make_amendment_archived', 'make_amendment_unArchived', 'make_amendment_votable',
                'make_amendment_unVotable', 'amend_amendment']
 
+    def formfield_for_dbfield(self, *args, **kwargs):
+        """
+            removes widgets add, change and delete from foreign keys during creation of class object
+        """
+        formfield = super().formfield_for_dbfield(*args, **kwargs)
+
+        formfield.widget.can_add_related = False
+        formfield.widget.can_delete_related = False
+        formfield.widget.can_change_related = False
+
+        return formfield
+
+    def log_addition(self, request, object, message):
+        """
+            method to add adding action to recent actions display
+        """
+        messages = "Amended motion: %s; with: %s" % (str(object.motion_amended), str(object))
+        return LogEntry.objects.log_action(
+            user_id=request.user.pk,
+            content_type_id=get_content_type_for_model(object).pk,
+            object_id=object.pk,
+            object_repr=messages,  # (str(object),
+            action_flag=ADDITION,
+            change_message=message)
+
+    def log_change(self, *args):
+        """
+            method eliminate change actions from recent actions display
+        """
+        return
+
+    def log_deletion(self, *args):
+        """
+            method eliminate delete actions from recent actions display
+        """
+        return
+
     def make_amendment_archived(self, request, queryset):
         """
             method to make selected amendment an archive amendment

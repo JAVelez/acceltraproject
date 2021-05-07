@@ -1,3 +1,6 @@
+from datetime import date
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -8,6 +11,13 @@ import base.models as base
 
 
 class Assembly(models.Model):
+    def date_validation(value):
+        """
+        method that activates a validation error when a past event date is selected in the creation of assembly
+        """
+        today = date.today()
+        if value < today:
+            raise ValidationError('Please select a current or future date.')
     """
     model to add student values not found in Django's user model
     :param assembly_name: assembly name
@@ -18,7 +28,7 @@ class Assembly(models.Model):
     """
     assembly_name = models.CharField(max_length=200, default="")
     date = models.DateTimeField('pub date', editable=False, default=timezone.now)
-    event_date = models.DateField('event date', default=timezone.now)
+    event_date = models.DateField('event date', default=timezone.now, validators=[date_validation])
     quorum = models.IntegerField(default=0, editable=False)
     agenda = models.TextField(max_length=1000, default="N/A")
     archived = models.BooleanField(default=False)
