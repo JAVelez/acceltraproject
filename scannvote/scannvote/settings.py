@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '4)9^@ad3@v5l^0$*dl$emrg9t$k+__01ucynu6x73$h%c4-9#p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['scannvote.herokuapp.com', '127.0.0.1']
 

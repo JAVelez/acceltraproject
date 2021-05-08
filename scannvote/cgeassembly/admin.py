@@ -148,7 +148,7 @@ class MotionAdmin(admin.ModelAdmin):
         """
             method to make motion not votable
         """
-        queryset.update(voteable=True)
+        queryset.update(voteable=False)
     make_motion_unVotable.short_description = "Unallow motion to be votable"
 
     def amend_motion(self, request, queryset):
@@ -240,7 +240,7 @@ class AmendmentAdmin(admin.ModelAdmin):
         """
             method to make amendment not votable
         """
-        queryset.update(voteable=True)
+        queryset.update(voteable=False)
     make_amendment_unVotable.short_description = "Unallow amendment to be votable"
 
     def amend_amendment(self, request, queryset):
