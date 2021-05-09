@@ -11,6 +11,7 @@ from django.db.models.query import QuerySet
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+import django.middleware.csrf
 
 from django.contrib.auth.models import User
 
@@ -218,4 +219,5 @@ def logout_student(request):
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 def token(request):
-    return Response(data={'token': request.COOKIES['csrftoken']}, status=status.HTTP_200_OK)
+    token = django.middleware.csrf.get_token(request)
+    return Response(data={'token': token}, status=status.HTTP_200_OK)
