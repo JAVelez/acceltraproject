@@ -40,6 +40,10 @@ class Student(models.Model):
     def get_student_by_student_id(student_id):
         return Student.objects.filter(student_id=student_id).first()
 
+    @staticmethod
+    def get_student_by_username(user):
+        return Student.objects.get(user=User.objects.get(username=user))
+
 
 @receiver(post_save, sender=User)
 def update_user_profile(sender, instance, created, **kwargs):

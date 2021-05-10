@@ -17,6 +17,10 @@ from django.contrib.auth.models import User
 
 import base.forms as baseforms
 
+import cgeassembly.models as CGEModel
+
+QUORUM = 1175
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -80,11 +84,17 @@ def MotionDetailVote(request, pk):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    if request.user.id is None:
+    if CGEModel.Assembly.get_current_assembly().quorum < CGEModel.Quorum.get_quorum():
+        return Response(data={'error_message': "Not enough quorum", 'code': '6'}, status=status.HTTP_403_FORBIDDEN)
+
+    if request.POST.__contains__('username'):
+        student = base.Student.get_student_by_username(request.POST['username'])
+    elif request.data.__contains__('username'):
+        student = base.Student.get_student_by_username(request.data['username'])
+    else:
         return Response(data={'error_message': "User is not logged in", 'code': '5'}, status=status.HTTP_403_FORBIDDEN)
 
     motion = get_object_or_404(cge.Motion, pk=pk)
-    student = base.Student.get_student_by_user(request.user)
 
     # case where a staff member has not open the motion to votes or is a past motion already voted on (archived)
     if motion.archived or not motion.voteable:

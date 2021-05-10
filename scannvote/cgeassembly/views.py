@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views import generic
 
 from django.shortcuts import render
-from .models import Motion, Assembly, Vote, Interaction
+from .models import Motion, Assembly, Vote, Interaction, Quorum
 import scannvote.settings as settings
 import base.models as base
 from . import models
@@ -15,6 +15,7 @@ from .forms import EntryForm
 A_FAVOR = '0'
 EN_CONTRA = '1'
 ABSTENIDO = '2'
+QUORUM = 1175
 
 
 class AssemblyIndexView(generic.ListView):
@@ -65,6 +66,11 @@ def vote(request, motion_id):
     motion = get_object_or_404(Motion, pk=motion_id)
     student = base.Student.get_student_by_user(request.user)
 
+    if Assembly.get_current_assembly().quorum < Quorum.get_quorum():
+        return render(request, 'cgeassembly/motiondetail.html',
+                      {'motion': motion, 'error_message': "Not enough quorum",
+                       'status_code': '200', 'code': '4'})
+
     # case where a staff member has not open the motion to votes or is a past motion already voted on (archived)
     if motion.archived or not motion.voteable:
         return render(request, 'cgeassembly/motiondetail.html',
@@ -111,6 +117,10 @@ def scanner(request):
     :param request: http request containing their student_id
     :return: if successful, redirects to scanner page, if not, returns an appropriate error message
     """
+
+    if not Assembly.get_current_assembly():
+        return render(request, 'cgeassembly/scanner.html', {'form': EntryForm(),
+                                                                    'status_code': '200', 'code': '3'})
     if not request.user.is_staff and not request.user.is_superuser:
         return render(request, 'cgeassembly/scanner.html', {'status_code': '200', 'code': '3',
                                                             'error_message': 'The user does not have the required permissions'})
@@ -127,7 +137,7 @@ def scanner(request):
                 else:
                     code = '1'  # stopped attending
                 return render(request, 'cgeassembly/scanner.html', {'form': EntryForm(),
-                                                                    'status_code': '200', 'code': code})
+                                                                    'status_code': '200', 'code': code, 'student_id': student_id})
             else:
                 return render(request, 'cgeassembly/scanner.html', {'form': form,
                                                                     'status_code': '200', 'code': '2',

@@ -3,8 +3,17 @@ from django.contrib.admin.options import get_content_type_for_model
 from django.db import models
 from django.contrib import admin
 
-from .models import Assembly, Interaction, Motion, Amendment
+from .models import Assembly, Interaction, Motion, Amendment, Quorum
 import base.models as base
+
+
+class QuorumAdmin(admin.ModelAdmin):
+    """
+    """
+    fieldsets = [
+        ('Required Fields', {'fields': ['minimum_attendance']}),
+    ]
+    list_display = ['minimum_attendance']
 
 
 class AssemblyAdmin(admin.ModelAdmin):
@@ -81,7 +90,7 @@ class MotionAdmin(admin.ModelAdmin):
         ('Required Fields', {'fields': ['assembly', 'motion_text', ]}),
     ]
     # changelistview
-    list_display = ['motion_text', 'is_Amendment', 'assembly', 'a_favor', 'en_contra', 'abstenido',]
+    list_display = ['motion_text', 'is_Amendment', 'assembly', 'a_favor', 'en_contra', 'abstenido', 'voteable', 'archived']
     list_filter = ['assembly', 'archived', 'is_Amendment']
     actions = ['make_motion_archived', 'make_motion_votable', 'make_motion_unArchived', 'make_motion_unVotable', 'amend_motion']
 
@@ -157,7 +166,7 @@ class MotionAdmin(admin.ModelAdmin):
         """
         amended_text = 'Enmendado: ' + Amendment.objects.all().order_by('-date')[0].motion_text + '\nMoción original: ' + queryset[0].motion_text
         queryset.update(motion_text=amended_text)
-    amend_motion.short_description = "Amend motion with lastest amendment"
+    amend_motion.short_description = "Amend motion with latest amendment"
 
 
 class AmendmentAdmin(admin.ModelAdmin):
@@ -172,7 +181,7 @@ class AmendmentAdmin(admin.ModelAdmin):
         ('Required Fields', {'fields': ['assembly', 'motion_amended', 'motion_text', ]}),
     ]
     # changelistview
-    list_display = ['motion_text', 'date', 'assembly']
+    list_display = ['motion_text', 'date', 'assembly', 'a_favor', 'en_contra', 'abstenido', 'voteable', 'archived']
     list_filter = ['archived']
     actions = ['make_amendment_archived', 'make_amendment_unArchived', 'make_amendment_votable',
                'make_amendment_unVotable', 'amend_amendment']
@@ -255,3 +264,4 @@ class AmendmentAdmin(admin.ModelAdmin):
 admin.site.register(Assembly, AssemblyAdmin)
 admin.site.register(Motion, MotionAdmin)
 admin.site.register(Amendment, AmendmentAdmin)
+admin.site.register(Quorum, QuorumAdmin)

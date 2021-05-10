@@ -5,10 +5,13 @@
 <h1>This is the scanner portal for admins</h1>
   {% if status_code == '200' %}
     {% if code == '1' %}
-      <h3> <span style = "background-color: #ff6e6e"> Student has stopped attending</span></h3>
+      <h3> <span style = "background-color: #ff6e6e"> Student {{student_id}} has stopped attending</span></h3>
     {% endif %}
     {% if code == '0' %}
-      <h3> <span style = "background-color: #6dff6d"> Student has started attending</span></h3>
+      <h3> <span style = "background-color: #6dff6d"> Student {{student_id}} has started attending</span></h3>
+    {% endif %}
+    {% if code == '3' %}
+      <h3> <span style = "background-color: #ff6e6e"> There is no current assembly</span></h3>
     {% endif %}
   {% endif %}
   <form method="post">
@@ -26,7 +29,12 @@
         {% endif %}
       </p>
     {% endfor %}
-    <button name = "scanner" type="submit">Student Scan</button>
+    {% if status_code == '200' %}
+      {% if code == '3' %}
+      {% else %}
+        <button name = "scanner" type="submit">Student Scan</button>
+      {% endif %}
+    {% endif %}
   </form>
 </div>
 

@@ -10,6 +10,18 @@ import base.models as base
 # CGE focused models
 
 
+class Quorum(models.Model):
+    """
+    model to add quorum value to allow voting
+    :param minimum_attendance: quorum to allow voting
+    """
+    minimum_attendance = models.IntegerField(default=0)
+
+    @staticmethod
+    def get_quorum():
+        return Quorum.objects.all().first().minimum_attendance
+
+
 class Assembly(models.Model):
     def date_validation(value):
         """
@@ -128,7 +140,7 @@ class Motion(models.Model):
     motion_text = models.TextField('Content to display', max_length=1000)
     date = models.DateTimeField('date published', default=timezone.now, editable=False)
     archived = models.BooleanField(default=False)
-    voteable = models.BooleanField(default=False)
+    voteable = models.BooleanField('votable', default=False)
     is_Amendment = models.BooleanField(default=False)
 
     # choices
